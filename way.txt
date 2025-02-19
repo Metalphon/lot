@@ -1,0 +1,92 @@
+=== Flask应用后台部署指南 ===
+
+1. 基本命令
+-----------------
+# 启动应用在后台运行
+nohup python3 app.py > output.log 2>&1 &
+
+# 查看运行状态
+ps -ef | grep python3
+
+# 查看日志输出
+tail -f output.log
+
+2. 进程管理
+-----------------
+# 停止应用
+kill <进程ID>
+
+# 确认进程已停止
+ps -ef | grep python3
+
+3. 命令说明
+-----------------
+nohup: 让进程忽略SIGHUP信号，即使终端关闭也继续运行
+> output.log: 将标准输出重定向到日志文件
+2>&1: 将标准错误也重定向到同一个日志文件
+&: 在后台运行
+
+4. 使用步骤
+-----------------
+1) 进入应用目录
+cd /path/to/your/app
+
+2) 启动应用
+nohup python3 app.py > output.log 2>&1 &
+
+3) 确认运行状态
+ps -ef | grep python3
+
+4) 查看运行日志
+tail -f output.log
+
+5. 常见问题处理
+-----------------
+1) 重启应用：
+- 找到进程ID: ps -ef | grep python3
+- 停止旧进程: kill <进程ID>
+- 启动新进程: nohup python3 app.py > output.log 2>&1 &
+
+2) 日志文件过大：
+- 清空日志: echo "" > output.log
+- 或备份旧日志: mv output.log output.log.old
+
+6. 注意事项
+-----------------
+- 确保在运行命令前已进入正确的目录
+- 定期检查日志文件大小
+- 重要的错误信息会记录在output.log中
+- 关闭SSH连接后，应用会继续在后台运行
+
+后台运行Flask应用的方法：
+
+1. 启动应用
+命令：nohup python3 app.py > output.log 2>&1 &
+说明：
+- nohup：让应用在后台运行
+- > output.log：将标准输出重定向到日志文件
+- 2>&1：将错误输出也重定向到同一个文件
+- &：在后台运行
+
+2. 检查运行状态
+- 查看进程：ps -ef | grep python3
+- 检查端口：netstat -tulpn | grep 5000
+- 测试API：curl http://localhost:5000/api/mqtt_status
+
+3. 查看日志
+- 实时查看：tail -f output.log
+- 查看最后100行：tail -n 100 output.log
+
+4. 停止应用
+- 查找PID：ps -ef | grep python3
+- 终止进程：kill <PID>
+
+5. 重启应用
+- 停止旧进程：kill <PID>
+- 清空日志：echo "" > output.log
+- 重新启动：nohup python3 app.py > output.log 2>&1 &
+
+注意事项：
+1. 确保应用正确配置了host和port
+2. 检查防火墙是否允许端口访问
+3. 定期检查日志确保应用运行正常

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        .wheel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+        .button {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .button:active {
+            transform: scale(0.9);
+        }
+        .up { top: 10px; left: 75px; }
+        .down { bottom: 10px; left: 75px; }
+        .left { left: 10px; top: 75px; }
+        .right { right: 10px; top: 75px; }
+    </style>
+</head>
+<body>
+    <h1>Control Wheel</h1>
+    <div class="wheel">
+        <div class="button up" onclick="sendData(1)">Up</div>
+        <div class="button down" onclick="sendData(2)">Down</div>
+        <div class="button left" onclick="sendData(3)">Left</div>
+        <div class="button right" onclick="sendData(4)">Right</div>
+    </div>
+
+    <script>
+    function sendMessage() {
+    console.log("开始发送消息...");
+    const message = document.getElementById('message').value;
+    console.log("要发送的消息:", message);
+
+    fetch('/api/send_message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => {
+        console.log("收到服务器响应:", response);
+        return response.json();
+    })
+    .then(data => {
+        console.log("处理响应数据:", data);
+        if (data.status === 'success') {
+            console.log("消息发送成功");
+            document.getElementById('status').textContent = '消息发送成功';
+        } else {
+            console.error("消息发送失败:", data.message);
+            document.getElementById('status').textContent = '发送失败: ' + data.message;
+        }
+    })
+    .catch(error => {
+        console.error("请求出错:", error);
+        document.getElementById('status').textContent = '发送出错: ' + error;
+    });
+}
+
+// 添加MQTT状态检查
+function checkMQTTStatus() {
+    fetch('/api/mqtt_status')
+        .then(response => response.json())
+        .then(data => {
+            console.log("MQTT状态:", data);
+            document.getElementById('mqtt-status').textContent = 
+                `MQTT状态: ${data.status} (${data.details})`;
+        })
+        .catch(error => {
+            console.error("检查MQTT状态出错:", error);
+        });
+}
+
+// 定期检查MQTT状态
+setInterval(checkMQTTStatus, 5000);
+</script>
+
+<!-- 添加状态显示元素 -->
+<div id="mqtt-status" style="margin: 10px 0; color: blue;"></div>
+<div id="status" style="margin: 10px 0; color: green;"></div>
+</body>
+</html>

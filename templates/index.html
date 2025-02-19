@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制面板</title>
+    <script>
+        // 重试配置
+        const MAX_RETRIES = 5;  // 5次重试
+        const RETRY_DELAY = 50;  // 50ms延迟
+
+        async function sendMessageWithRetry(direction, retryCount = 0) {
+            try {
+                const response = await fetch('/api/send_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: direction })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    document.getElementById('status').textContent = direction;
+                } else {
+                    throw new Error(data.message || '未知错误');
+                }
+            } catch (error) {
+                if (retryCount < MAX_RETRIES) {
+                    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+                    return sendMessageWithRetry(direction, retryCount + 1);
+                } else {
+                    document.getElementById('status').textContent = '发送出错';
+                }
+            }
+        }
+
+        function sendMessage(direction) {
+            document.getElementById('status').textContent = '发送中';
+            sendMessageWithRetry(direction);
+        }
+    </script>
+</head>
+<body>
+    <h1>控制面板</h1>
+    <button onclick="sendMessage('Up')">Up</button>
+    <button onclick="sendMessage('Down')">Down</button>
+    <button onclick="sendMessage('Left')">Left</button>
+    <button onclick="sendMessage('Right')">Right</button>
+    <div id="status" style="margin: 10px 0; color: green;"></div>
+</body>
+</html> 
