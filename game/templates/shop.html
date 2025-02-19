@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}魔法商店{% endblock %}
+
+{% block style %}
+.shop-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    min-height: calc(100vh - 120px);
+}
+
+/* 左侧分类栏 */
+.shop-categories {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.shop-categories h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-color);
+}
+
+.category-item.active {
+    background: var(--primary-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(106, 76, 175, 0.3);
+}
+
+.category-item i {
+    margin-right: 12px;
+    color: var(--accent-color);
+    font-size: 1.2em;
+    width: 24px;
+    text-align: center;
+}
+
+/* 右侧商品区 */
+.shop-content {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-header h2 {
+    color: var(--accent-color);
+    font-size: 1.8em;
+}
+
+.shop-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-input {
+    width: 200px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-btn {
+    background: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 15px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.search-btn:hover {
+    background: var(--secondary-color);
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 8px 15px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-color);
+}
+
+.filter-btn i {
+    color: var(--accent-color);
+}
+
+/* 商品网格 */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.item-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.item-icon {
+    font-size: 2.5em;
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.item-name {
+    font-size: 1.2em;
+    color: var(--text-color);
+    font-weight: bold;
+    text-align: center;
+}
+
+.item-description {
+    color: var(--text-color);
+    opacity: 0.8;
+    text-align: center;
+    font-size: 0.9em;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.item-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-price {
+    color: var(--accent-color);
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.buy-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 1em;
+    width: 100%;
+}
+
+.buy-btn:hover {
+    background: var(--secondary-color);
+}
+
+.buy-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+/* 购买弹窗 */
+.item-modal {
+    background: var(--background-color);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.item-details {
+    margin: 20px 0;
+}
+
+.quantity-control {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.quantity-btn {
+    background: var(--primary-color);
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+}
+
+.quantity-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.total-price {
+    font-size: 1.4em;
+    color: var(--accent-color);
+    text-align: right;
+    padding: 15px 0;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    transition: all 0.3s;
+}
+
+.confirm-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: var(--secondary-color);
+}
+
+.cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .shop-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .shop-categories {
+        position: sticky;
+        top: 80px;
+        z-index: 10;
+    }
+    
+    .category-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    .shop-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .shop-controls {
+        width: 100%;
+    }
+    
+    .search-bar {
+        flex-grow: 1;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<div class="shop-container">
+    <div class="shop-categories">
+        <h2>商品分类</h2>
+        <div class="category-list">
+            <div class="category-item active">
+                <i class="fas fa-flask"></i>
+                <span>魔法材料</span>
+            </div>
+            <div class="category-item">
+                <i class="fas fa-scroll"></i>
+                <span>魔法卷轴</span>
+            </div>
+            <div class="category-item">
+                <i class="fas fa-hat-wizard"></i>
+                <span>魔法装备</span>
+            </div>
+            <div class="category-item">
+                <i class="fas fa-vial"></i>
+                <span>魔法药水</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="shop-content">
+        <div class="shop-header">
+            <h2>魔法材料</h2>
+            <div class="shop-controls">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="搜索商品...">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                    <span>筛选</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="items-grid">
+            <div class="item-card">
+                <div class="item-icon">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <div class="item-name">魔法木材</div>
+                <div class="item-description">蕴含魔力的珍贵木材，可用于制作魔法道具和法杖。</div>
+                <div class="item-stats">
+                    <div class="stat-item">
+                        <span>品质</span>
+                        <span>优秀</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>等级</span>
+                        <span>1</span>
+                    </div>
+                </div>
+                <div class="item-price">100 金币</div>
+                <button class="buy-btn">购买</button>
+            </div>
+            
+            <div class="item-card">
+                <div class="item-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="item-name">魔力结晶</div>
+                <div class="item-description">凝聚魔力的晶体，是制作高级魔法道具的必备材料。</div>
+                <div class="item-stats">
+                    <div class="stat-item">
+                        <span>品质</span>
+                        <span>稀有</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>等级</span>
+                        <span>2</span>
+                    </div>
+                </div>
+                <div class="item-price">200 金币</div>
+                <button class="buy-btn">购买</button>
+            </div>
+            
+            <div class="item-card">
+                <div class="item-icon">
+                    <i class="fas fa-feather"></i>
+                </div>
+                <div class="item-name">凤凰羽毛</div>
+                <div class="item-description">蕴含火焰之力的羽毛，可用于制作火系魔法道具。</div>
+                <div class="item-stats">
+                    <div class="stat-item">
+                        <span>品质</span>
+                        <span>史诗</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>等级</span>
+                        <span>3</span>
+                    </div>
+                </div>
+                <div class="item-price">500 金币</div>
+                <button class="buy-btn">购买</button>
+            </div>
+            
+            <div class="item-card">
+                <div class="item-icon">
+                    <i class="fas fa-dragon"></i>
+                </div>
+                <div class="item-name">龙鳞</div>
+                <div class="item-description">坚硬的龙鳞碎片，可用于制作防具和护符。</div>
+                <div class="item-stats">
+                    <div class="stat-item">
+                        <span>品质</span>
+                        <span>传说</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>等级</span>
+                        <span>4</span>
+                    </div>
+                </div>
+                <div class="item-price">1000 金币</div>
+                <button class="buy-btn">购买</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="overlay"></div>
+<div class="item-modal">
+    <div class="modal-header">
+        <h3>购买物品</h3>
+        <button class="close-btn">&times;</button>
+    </div>
+    
+    <div class="item-details">
+        <div class="item-stats">
+            <div class="stat-item">
+                <span>品质</span>
+                <span>优秀</span>
+            </div>
+            <div class="stat-item">
+                <span>等级</span>
+                <span>1</span>
+            </div>
+            <div class="stat-item">
+                <span>耐久度</span>
+                <span>100/100</span>
+            </div>
+            <div class="stat-item">
+                <span>库存</span>
+                <span>99</span>
+            </div>
+        </div>
+        
+        <div class="quantity-control">
+            <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+            <input type="number" class="quantity-input" value="1" min="1" max="99">
+            <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+        </div>
+        
+        <div class="total-price">
+            总价：<span id="totalPrice">100</span> 金币
+        </div>
+    </div>
+    
+    <div class="modal-controls">
+        <button class="modal-btn confirm-btn">确认购买</button>
+        <button class="modal-btn cancel-btn">取消</button>
+    </div>
+</div>
+{% endblock %} 

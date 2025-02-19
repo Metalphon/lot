@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命起源</title>
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --text-color: #e94560;
+            --particle-color: #00ff9d;
+            --nucleus-color: #ff9d00;
+            --atom-color: #9d00ff;
+            --dna-color: #ff0099;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .resources {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .resource-card {
+            background: var(--accent-color);
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .resource-card.particle { border-left: 4px solid var(--particle-color); }
+        .resource-card.nucleus { border-left: 4px solid var(--nucleus-color); }
+        .resource-card.atom { border-left: 4px solid var(--atom-color); }
+        .resource-card.dna { border-left: 4px solid var(--dna-color); }
+
+        .resource-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .resource-name {
+            font-size: 1.2em;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resource-amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--particle-color);
+        }
+
+        .particle .resource-amount { color: var(--particle-color); }
+        .nucleus .resource-amount { color: var(--nucleus-color); }
+        .atom .resource-amount { color: var(--atom-color); }
+        .dna .resource-amount { color: var(--dna-color); }
+
+        .resource-rate {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .resource-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: var(--text-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .action-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .action-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .stats {
+            margin-top: 30px;
+            background: var(--accent-color);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 粒子动画 */
+        .particle-effect {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="resources">
+            <div class="resource-card particle">
+                <div class="resource-info">
+                    <div class="resource-name">粒子</div>
+                    <div class="resource-amount" id="particleCount">10</div>
+                    <div class="resource-rate" id="particleRate">+0/秒</div>
+                </div>
+            </div>
+
+            <div class="resource-card nucleus">
+                <div class="resource-info">
+                    <div class="resource-name">原子核</div>
+                    <div class="resource-amount" id="nucleusCount">0</div>
+                    <div class="resource-rate" id="nucleusRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyNucleusBtn">
+                        购买 (10粒子)
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card atom">
+                <div class="resource-info">
+                    <div class="resource-name">原子</div>
+                    <div class="resource-amount" id="atomCount">0</div>
+                    <div class="resource-rate" id="atomRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyAtomBtn">
+                        购买 (50粒子)
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card dna">
+                <div class="resource-info">
+                    <div class="resource-name">DNA</div>
+                    <div class="resource-amount" id="dnaCount">0</div>
+                    <div class="resource-rate" id="dnaRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyDnaBtn">
+                        购买 (200粒子)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span>总计生产的粒子</span>
+                <span id="totalParticles">10</span>
+            </div>
+            <div class="stat-item">
+                <span>生产效率</span>
+                <span id="currentEfficiency">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            particles: 10,
+            nuclei: 0,
+            atoms: 0,
+            dna: 0,
+            totalParticles: 10,
+            lastTick: Date.now(),
+            
+            // 基础产出率
+            nucleusProductionRate: 1,    // 每个原子核每秒产生的粒子
+            atomProductionRate: 0.2,     // 每个原子每秒产生的原子核
+            dnaProductionRate: 0.1,      // 每个DNA每秒产生的原子
+            
+            // 价格
+            nucleusPrice: 10,            // 原子核价格（粒子）
+            atomPrice: 50,               // 原子价格（粒子）
+            dnaPrice: 200,               // DNA价格（粒子）
+        };
+
+        function updateDisplay() {
+            // 更新资源数量
+            document.getElementById('particleCount').textContent = Math.floor(gameState.particles);
+            document.getElementById('nucleusCount').textContent = Math.floor(gameState.nuclei);
+            document.getElementById('atomCount').textContent = Math.floor(gameState.atoms);
+            document.getElementById('dnaCount').textContent = Math.floor(gameState.dna);
+            
+            // 更新产出率
+            const nucleusEfficiency = calculateEfficiency(gameState.nuclei);
+            const atomEfficiency = calculateEfficiency(gameState.atoms);
+            const dnaEfficiency = calculateEfficiency(gameState.dna);
+            
+            const particleRate = gameState.nuclei * gameState.nucleusProductionRate * nucleusEfficiency;
+            const nucleusRate = gameState.atoms * gameState.atomProductionRate * atomEfficiency;
+            const atomRate = gameState.dna * gameState.dnaProductionRate * dnaEfficiency;
+            
+            document.getElementById('particleRate').textContent = `+${particleRate.toFixed(1)}/秒`;
+            document.getElementById('nucleusRate').textContent = `+${nucleusRate.toFixed(1)}/秒`;
+            document.getElementById('atomRate').textContent = `+${atomRate.toFixed(1)}/秒`;
+            
+            // 更新总计和效率
+            document.getElementById('totalParticles').textContent = Math.floor(gameState.totalParticles);
+            document.getElementById('currentEfficiency').textContent = 
+                `${(nucleusEfficiency * 100).toFixed(1)}% / ${(atomEfficiency * 100).toFixed(1)}% / ${(dnaEfficiency * 100).toFixed(1)}%`;
+            
+            // 更新按钮状态
+            document.getElementById('buyNucleusBtn').disabled = gameState.particles < gameState.nucleusPrice;
+            document.getElementById('buyAtomBtn').disabled = gameState.particles < gameState.atomPrice;
+            document.getElementById('buyDnaBtn').disabled = gameState.particles < gameState.dnaPrice;
+        }
+
+        function calculateEfficiency(count) {
+            return 1 / (1 + count * 0.1);
+        }
+
+        function createParticleEffect(color = '#00ff9d') {
+            const particle = document.createElement('div');
+            particle.className = 'particle-effect';
+            particle.style.background = color;
+            
+            const x = Math.random() * window.innerWidth;
+            const y = window.innerHeight;
+            
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 3000);
+        }
+
+        function gameLoop() {
+            const now = Date.now();
+            const deltaTime = (now - gameState.lastTick) / 1000;
+            gameState.lastTick = now;
+
+            // 计算各级生物的效率
+            const nucleusEfficiency = calculateEfficiency(gameState.nuclei);
+            const atomEfficiency = calculateEfficiency(gameState.atoms);
+            const dnaEfficiency = calculateEfficiency(gameState.dna);
+            
+            // 计算新产生的资源
+            const newParticles = gameState.nuclei * gameState.nucleusProductionRate * nucleusEfficiency * deltaTime;
+            const newNuclei = gameState.atoms * gameState.atomProductionRate * atomEfficiency * deltaTime;
+            const newAtoms = gameState.dna * gameState.dnaProductionRate * dnaEfficiency * deltaTime;
+            
+            // 更新资源数量
+            gameState.particles += newParticles;
+            gameState.nuclei += newNuclei;
+            gameState.atoms += newAtoms;
+            gameState.totalParticles += newParticles;
+
+            // 创建视觉效果
+            if (Math.random() < newParticles * 0.1) createParticleEffect(var(--particle-color));
+            if (Math.random() < newNuclei * 0.1) createParticleEffect(var(--nucleus-color));
+            if (Math.random() < newAtoms * 0.1) createParticleEffect(var(--atom-color));
+
+            updateDisplay();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 初始化事件监听
+        document.getElementById('buyNucleusBtn').addEventListener('click', () => {
+            if (gameState.particles >= gameState.nucleusPrice) {
+                gameState.particles -= gameState.nucleusPrice;
+                gameState.nuclei += 1;
+                updateDisplay();
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => createParticleEffect(var(--nucleus-color)), i * 100);
+                }
+            }
+        });
+
+        document.getElementById('buyAtomBtn').addEventListener('click', () => {
+            if (gameState.particles >= gameState.atomPrice) {
+                gameState.particles -= gameState.atomPrice;
+                gameState.atoms += 1;
+                updateDisplay();
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => createParticleEffect(var(--atom-color)), i * 100);
+                }
+            }
+        });
+
+        document.getElementById('buyDnaBtn').addEventListener('click', () => {
+            if (gameState.particles >= gameState.dnaPrice) {
+                gameState.particles -= gameState.dnaPrice;
+                gameState.dna += 1;
+                updateDisplay();
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => createParticleEffect(var(--dna-color)), i * 100);
+                }
+            }
+        });
+
+        // 启动游戏循环
+        gameLoop();
+    </script>
+</body>
+</html> 

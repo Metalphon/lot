@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔法实验室 - {% block title %}{% endblock %}</title>
+    <style>
+        :root {
+            --primary-color: #6a4caf;
+            --secondary-color: #845ef7;
+            --background-color: #1a1a2e;
+            --text-color: #e6e6e6;
+            --accent-color: #ffd700;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .game-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-item i {
+            color: var(--accent-color);
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .flash-message {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        {% block style %}{% endblock %}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">首页</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('game') }}">游戏大厅</a>
+                    <a href="{{ url_for('laboratory') }}">魔法实验室</a>
+                    <a href="{{ url_for('study') }}">魔法课堂</a>
+                    <a href="{{ url_for('shop') }}">商店</a>
+                    <a href="{{ url_for('profile') }}">个人信息</a>
+                    <a href="{{ url_for('logout') }}">退出</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">登录</a>
+                    <a href="{{ url_for('register') }}">注册</a>
+                {% endif %}
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="status-bar">
+                <div class="status-item">
+                    <i class="fas fa-user"></i>
+                    {{ current_user.username }}
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-star"></i>
+                    等级 {{ current_user.level }}
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-coins"></i>
+                    {{ current_user.gold }} 金币
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-heart"></i>
+                    {{ current_user.hp }}/100
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-fire"></i>
+                    {{ current_user.mp }}/100
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="game-content">
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // 通用JavaScript函数
+        function showMessage(message) {
+            const flashMessages = document.querySelector('.flash-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'flash-message';
+            messageElement.textContent = message;
+            flashMessages.appendChild(messageElement);
+            
+            setTimeout(() => {
+                messageElement.remove();
+            }, 3000);
+        }
+
+        {% block script %}{% endblock %}
+    </script>
+</body>
+</html> 

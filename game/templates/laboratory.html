@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}魔法实验室{% endblock %}
+
+{% block style %}
+.laboratory-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+.workbench {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.workbench h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.recipe-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.recipe-item {
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.recipe-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.recipe-item h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.recipe-item .requirements {
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.recipe-item .materials {
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.recipe-item .material {
+    display: inline-block;
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+.crafting-area {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.crafting-area h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.crafting-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.crafting-slot {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.crafting-slot:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.crafting-slot i {
+    font-size: 2em;
+    color: var(--accent-color);
+    opacity: 0.5;
+}
+
+.crafting-slot.has-item i {
+    opacity: 1;
+}
+
+.crafting-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.craft-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.craft-btn:hover {
+    background: var(--secondary-color);
+}
+
+.craft-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.result-area {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.result-area i {
+    font-size: 3em;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s;
+}
+
+.inventory {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.inventory h3 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+}
+
+.inventory-slot {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.inventory-slot i {
+    font-size: 1.5em;
+    color: var(--accent-color);
+}
+
+.inventory-slot .count {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    color: white;
+}
+{% endblock %}
+
+{% block content %}
+<div class="laboratory-container">
+    <div class="workbench">
+        <h2>制作配方</h2>
+        <div class="recipe-list">
+            <div class="recipe-item">
+                <h3>初级魔法杖</h3>
+                <div class="requirements">需要等级: 1</div>
+                <div class="materials">
+                    <span class="material">魔法木材 x2</span>
+                    <span class="material">魔力结晶 x1</span>
+                </div>
+            </div>
+            <div class="recipe-item">
+                <h3>魔力药水</h3>
+                <div class="requirements">需要等级: 1</div>
+                <div class="materials">
+                    <span class="material">魔力草 x3</span>
+                    <span class="material">纯净水 x1</span>
+                </div>
+            </div>
+            <div class="recipe-item">
+                <h3>魔法护符</h3>
+                <div class="requirements">需要等级: 2</div>
+                <div class="materials">
+                    <span class="material">魔力结晶 x2</span>
+                    <span class="material">秘银 x1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="crafting-area">
+        <h2>制作台</h2>
+        <div class="crafting-grid">
+            {% for i in range(9) %}
+            <div class="crafting-slot">
+                <i class="fas fa-plus"></i>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="result-area">
+            <i class="fas fa-question"></i>
+            <p>选择配方并放入材料开始制作</p>
+            <div class="progress-bar">
+                <div class="progress" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="crafting-controls">
+            <button class="craft-btn" disabled>开始制作</button>
+            <button class="craft-btn">清空材料</button>
+        </div>
+        
+        <div class="inventory">
+            <h3>材料库</h3>
+            <div class="inventory-grid">
+                <div class="inventory-slot">
+                    <i class="fas fa-tree"></i>
+                    <span class="count">5</span>
+                </div>
+                <div class="inventory-slot">
+                    <i class="fas fa-gem"></i>
+                    <span class="count">3</span>
+                </div>
+                <div class="inventory-slot">
+                    <i class="fas fa-leaf"></i>
+                    <span class="count">10</span>
+                </div>
+                <div class="inventory-slot">
+                    <i class="fas fa-tint"></i>
+                    <span class="count">8</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+// 选择配方
+document.querySelectorAll('.recipe-item').forEach(recipe => {
+    recipe.addEventListener('click', () => {
+        document.querySelectorAll('.recipe-item').forEach(r => r.style.background = 'rgba(255, 255, 255, 0.1)');
+        recipe.style.background = 'rgba(var(--primary-color), 0.3)';
+        showMessage('已选择配方：' + recipe.querySelector('h3').textContent);
+    });
+});
+
+// 放置材料
+document.querySelectorAll('.crafting-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+        if (!slot.classList.contains('has-item')) {
+            slot.classList.add('has-item');
+            slot.querySelector('i').style.opacity = '1';
+        } else {
+            slot.classList.remove('has-item');
+            slot.querySelector('i').style.opacity = '0.5';
+        }
+    });
+});
+
+// 制作按钮
+document.querySelector('.craft-btn').addEventListener('click', () => {
+    const progress = document.querySelector('.progress');
+    progress.style.width = '0%';
+    
+    let width = 0;
+    const interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            showMessage('制作完成！');
+            progress.style.width = '0%';
+        } else {
+            width += 2;
+            progress.style.width = width + '%';
+        }
+    }, 100);
+});
+{% endblock %} 

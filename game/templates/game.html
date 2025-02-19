@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}游戏大厅{% endblock %}
+
+{% block style %}
+.game-hall {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.location-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.location-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.location-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.location-card:hover::before {
+    transform: translateX(100%);
+}
+
+.location-card i {
+    font-size: 3em;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.location-card h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.location-card p {
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+
+.location-card .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.status-open {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.status-closed {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.status-maintenance {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.action-btn:hover {
+    background: var(--secondary-color);
+}
+
+.news-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.news-section h2 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.news-list {
+    list-style: none;
+    padding: 0;
+}
+
+.news-item {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+.news-item .date {
+    color: var(--accent-color);
+    font-size: 0.9em;
+}
+
+.news-item .title {
+    color: var(--text-color);
+    margin-left: 10px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="news-section">
+    <h2>最新公告</h2>
+    <ul class="news-list">
+        <li class="news-item">
+            <span class="date">2024-02-19</span>
+            <span class="title">欢迎来到魔法实验室！新手指南已更新。</span>
+        </li>
+        <li class="news-item">
+            <span class="date">2024-02-18</span>
+            <span class="title">系统更新：新增风系魔法学习任务。</span>
+        </li>
+        <li class="news-item">
+            <span class="date">2024-02-17</span>
+            <span class="title">商店上新：稀有材料"龙之心"限时发售。</span>
+        </li>
+    </ul>
+</div>
+
+<div class="game-hall">
+    <div class="location-card" onclick="window.location.href='{{ url_for('laboratory') }}'">
+        <i class="fas fa-flask"></i>
+        <h3>魔法实验室</h3>
+        <p>在这里制作魔法道具，进行魔法实验。</p>
+        <div class="status status-open">开放中</div>
+        <div class="quick-actions">
+            <button class="action-btn">快速实验</button>
+            <button class="action-btn">查看配方</button>
+        </div>
+    </div>
+    
+    <div class="location-card" onclick="window.location.href='{{ url_for('study') }}'">
+        <i class="fas fa-hat-wizard"></i>
+        <h3>魔法课堂</h3>
+        <p>学习各种魔法知识，提升魔法技能。</p>
+        <div class="status status-open">开放中</div>
+        <div class="quick-actions">
+            <button class="action-btn">开始学习</button>
+            <button class="action-btn">查看课程</button>
+        </div>
+    </div>
+    
+    <div class="location-card" onclick="window.location.href='{{ url_for('shop') }}'">
+        <i class="fas fa-store"></i>
+        <h3>魔法商店</h3>
+        <p>购买材料，出售成品，交易道具。</p>
+        <div class="status status-open">开放中</div>
+        <div class="quick-actions">
+            <button class="action-btn">浏览商品</button>
+            <button class="action-btn">我的仓库</button>
+        </div>
+    </div>
+    
+    <div class="location-card">
+        <i class="fas fa-dragon"></i>
+        <h3>冒险区域</h3>
+        <p>探索未知区域，与魔物战斗。</p>
+        <div class="status status-maintenance">维护中</div>
+        <div class="quick-actions">
+            <button class="action-btn" disabled>即将开放</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!btn.disabled) {
+            showMessage('功能开发中...');
+        }
+    });
+});
+{% endblock %} 

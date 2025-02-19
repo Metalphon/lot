@@ -156,27 +156,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .capture-hint {
-            padding: 10px 15px;
-            margin-left: 15px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 5px;
-            color: #856404;
-            min-width: 200px;
-            display: none;
-        }
-        
-        .capture-hint.show {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -187,7 +166,6 @@
             <button class="restart-button" onclick="restartGame()">重新开始</button>
             <button class="edit-mode-button" onclick="toggleEditMode()">普通模式</button>
             <button class="clear-board-button" onclick="clearBoard()">清除棋子</button>
-            <div class="capture-hint" id="captureHint"></div>
         </div>
         <div class="board" id="board"></div>
         
@@ -250,51 +228,6 @@
             if (editMode) {
                 showEditOptions(row, col);
             } else {
-                // 检查光标位置是否可以连续吃子
-                if (board[row][col] === null) {
-                    // 创建一个虚拟棋子用于检查
-                    const virtualPiece = {
-                        classList: {
-                            contains: (className) => className === currentPlayer
-                        }
-                    };
-                    
-                    // 临时将虚拟棋子放置在光标位置
-                    board[row][col] = virtualPiece;
-                    
-                    // 检查是否可以吃子
-                    const capturePaths = findAllCapturePaths(row, col, virtualPiece);
-                    
-                    // 移除虚拟棋子
-                    board[row][col] = null;
-                    
-                    // 只有当有多步连吃时才显示
-                    if (capturePaths.length > 0 && capturePaths.some(path => path.length > 1)) {
-                        // 找出最长的连吃路径
-                        const longestPath = capturePaths.reduce((longest, current) => 
-                            current.length > longest.length ? current : longest
-                        , []);
-                        
-                        // 显示最终位置
-                        clearHighlights();
-                        const finalMove = longestPath[longestPath.length - 1];
-                        const [finalRow, finalCol] = finalMove.targetPos;
-                        const finalSquare = document.querySelector(`[data-row='${finalRow}'][data-col='${finalCol}']`);
-                        finalSquare.classList.add('highlight');
-                        
-                        // 显示连吃提示
-                        const hintElement = document.getElementById('captureHint');
-                        const pieceType = currentPlayer === 'white-piece' ? '白棋' : '黑棋';
-                        hintElement.textContent = `光标位置可以连续吃${longestPath.length}个子！`;
-                        hintElement.classList.add('show');
-                        setTimeout(() => {
-                            hintElement.classList.remove('show');
-                        }, 3000);
-                        
-                        return;
-                    }
-                }
-                
                 clearHighlights();
                 if (selectedPiece) {
                     console.log(`Attempting to move piece from (${selectedPiece.row}, ${selectedPiece.col}) to (${row}, ${col})`);
@@ -388,230 +321,33 @@
             const { piece, row: oldRow, col: oldCol } = selectedPiece;
 
             if (isValidMove(oldRow, oldCol, row, col)) {
-                // 检查是否是吃子移动
-                const rowDiff = row - oldRow;
-                const colDiff = col - oldCol;
-                const isCapture = piece.classList.contains('king') ? 
-                    Math.abs(rowDiff) >= 2 && Math.abs(colDiff) >= 2 : // 王棋的吃子判断
-                    Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2; // 普通棋子的吃子判断
-
-                // 如果是吃子移动，检查是否可以继续吃子
-                if (isCapture) {
-                    // 获取所有可能的连续吃子路径
-                    const capturePaths = findAllCapturePaths(row, col, piece);
-                    if (capturePaths.length > 0) {
-                        // 执行最长的吃子路径
-                        const longestPath = capturePaths.reduce((longest, current) => 
-                            current.length > longest.length ? current : longest
-                        );
-                        
-                        // 先移动到第一个吃子位置
-                        board[oldRow][oldCol] = null;
-                        board[row][col] = piece;
-                        const square = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
-                        square.appendChild(piece);
-                        
-                        // 更新selectedPiece到当前位置
-                        selectedPiece = { piece, row, col };
-                        
-                        // 执行连续吃子
-                        executeCapturePath(row, col, piece, longestPath);
-                        return;
-                    }
-                }
-                
-                // 普通移动或单次吃子
                 board[oldRow][oldCol] = null;
                 board[row][col] = piece;
                 const square = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
                 square.appendChild(piece);
-
-                // 更新selectedPiece到新位置
-                selectedPiece = { piece, row, col };
+                selectedPiece = null;
+                console.log(`Moved piece to (${row}, ${col})`);
 
                 // Check for king promotion
                 if ((currentPlayer === 'white-piece' && row === 0) || (currentPlayer === 'black-piece' && row === 9)) {
                     piece.classList.add('king');
+                    console.log(`Piece at (${row}, ${col}) promoted to king`);
                 }
 
-                if (isCapture) {
-                    // 单次吃子，检查是否有后续吃子机会
-                    if (canCapture(row, col)) {
-                        highlightMoves(row, col);
-                    } else {
-                        selectedPiece = null;
-                        currentPlayer = currentPlayer === 'white-piece' ? 'black-piece' : 'white-piece';
-                        updateCurrentPlayerText();
-                    }
+                // Check if another capture is possible
+                if (Math.abs(row - oldRow) === 2 && canCapture(row, col)) {
+                    selectedPiece = { piece, row, col };
+                    highlightMoves(row, col);
                 } else {
-                    // 普通移动，直接切换玩家
-                    selectedPiece = null;
+                    // Switch player if no more captures
                     currentPlayer = currentPlayer === 'white-piece' ? 'black-piece' : 'white-piece';
                     updateCurrentPlayerText();
+                    console.log(`Switched to ${currentPlayer}`);
                 }
             } else {
                 console.log(`Invalid move from (${oldRow}, ${oldCol}) to (${row}, ${col})`);
-                selectedPiece = null;
+                selectedPiece = null; // Reset selection if move is invalid
             }
-        }
-
-        // 查找所有可能的连续吃子路径
-        function findAllCapturePaths(startRow, startCol, piece, path = [], paths = []) {
-            const currentPath = [...path];
-            
-            // 模拟当前位置的所有可能吃子
-            const possibleCaptures = [];
-            const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-            
-            if (piece.classList.contains('king')) {
-                // 王棋的吃子检查
-                for (const [dRow, dCol] of directions) {
-                    let checkRow = startRow + dRow;
-                    let checkCol = startCol + dCol;
-                    let foundOpponent = false;
-                    let opponentPos = null;
-                    
-                    while (checkRow >= 0 && checkRow < 10 && checkCol >= 0 && checkCol < 10) {
-                        if (board[checkRow][checkCol] !== null) {
-                            if (board[checkRow][checkCol].classList.contains(currentPlayer)) break;
-                            if (foundOpponent) break;
-                            foundOpponent = true;
-                            opponentPos = [checkRow, checkCol];
-                            
-                            // 继续检查对手棋子后的空位
-                            let nextRow = checkRow + dRow;
-                            let nextCol = checkCol + dCol;
-                            while (nextRow >= 0 && nextRow < 10 && nextCol >= 0 && nextCol < 10) {
-                                if (board[nextRow][nextCol] !== null) break;
-                                possibleCaptures.push({
-                                    targetPos: [nextRow, nextCol],
-                                    capturePos: opponentPos
-                                });
-                                nextRow += dRow;
-                                nextCol += dCol;
-                            }
-                            break;
-                        }
-                        checkRow += dRow;
-                        checkCol += dCol;
-                    }
-                }
-            } else {
-                // 普通棋子的吃子检查
-                for (const [dRow, dCol] of directions) {
-                    const newRow = startRow + 2 * dRow;
-                    const newCol = startCol + 2 * dCol;
-                    const middleRow = startRow + dRow;
-                    const middleCol = startCol + dCol;
-                    
-                    if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10 && 
-                        board[middleRow][middleCol] && 
-                        !board[middleRow][middleCol].classList.contains(currentPlayer) && 
-                        board[newRow][newCol] === null) {
-                        possibleCaptures.push({
-                            targetPos: [newRow, newCol],
-                            capturePos: [middleRow, middleCol]
-                        });
-                    }
-                }
-            }
-            
-            if (possibleCaptures.length === 0) {
-                if (currentPath.length > 0) {
-                    paths.push(currentPath);
-                }
-                return paths;
-            }
-            
-            // 对每个可能的吃子位置进行递归
-            for (const capture of possibleCaptures) {
-                const [targetRow, targetCol] = capture.targetPos;
-                const [captureRow, captureCol] = capture.capturePos;
-                
-                // 保存当前状态
-                const originalBoard = board.map(row => [...row]);
-                
-                // 模拟吃子
-                board[captureRow][captureCol] = null;
-                board[startRow][startCol] = null;
-                board[targetRow][targetCol] = piece;
-                
-                // 递归查找后续吃子
-                findAllCapturePaths(targetRow, targetCol, piece, 
-                    [...currentPath, { targetPos: capture.targetPos, capturePos: capture.capturePos }], 
-                    paths);
-                
-                // 恢复状态
-                board.forEach((row, i) => {
-                    board[i] = [...originalBoard[i]];
-                });
-            }
-            
-            return paths;
-        }
-
-        // 执行连续吃子路径
-        function executeCapturePath(startRow, startCol, piece, path) {
-            let currentRow = startRow;
-            let currentCol = startCol;
-            
-            // 创建动画效果的延迟时间
-            const delay = 2000; // 2秒
-            
-            // 清除所有高亮
-            clearHighlights();
-            
-            // 直接显示最终位置的高亮
-            const finalMove = path[path.length - 1];
-            const [finalRow, finalCol] = finalMove.targetPos;
-            const finalSquare = document.querySelector(`[data-row='${finalRow}'][data-col='${finalCol}']`);
-            finalSquare.classList.add('highlight');
-            
-            // 立即更新selectedPiece到最终位置
-            selectedPiece = { piece, row: finalRow, col: finalCol };
-            
-            path.forEach((move, index) => {
-                setTimeout(() => {
-                    const [targetRow, targetCol] = move.targetPos;
-                    const [captureRow, captureCol] = move.capturePos;
-                    
-                    // 移除被吃的棋子
-                    if (board[captureRow][captureCol]) {
-                        board[captureRow][captureCol].remove();
-                        board[captureRow][captureCol] = null;
-                    }
-                    
-                    // 移动当前棋子
-                    board[currentRow][currentCol] = null;
-                    board[targetRow][targetCol] = piece;
-                    const targetSquare = document.querySelector(`[data-row='${targetRow}'][data-col='${targetCol}']`);
-                    targetSquare.appendChild(piece);
-                    
-                    currentRow = targetRow;
-                    currentCol = targetCol;
-                    
-                    // 如果是最后一步
-                    if (index === path.length - 1) {
-                        // 检查是否需要升王
-                        if ((currentPlayer === 'white-piece' && targetRow === 0) || 
-                            (currentPlayer === 'black-piece' && targetRow === 9)) {
-                            piece.classList.add('king');
-                        }
-                        
-                        // 检查是否还能继续吃子
-                        if (canCapture(currentRow, currentCol)) {
-                            setTimeout(() => {
-                                highlightMoves(currentRow, currentCol);
-                            }, 100);
-                        } else {
-                            selectedPiece = null;
-                            currentPlayer = currentPlayer === 'white-piece' ? 'black-piece' : 'white-piece';
-                            updateCurrentPlayerText();
-                            clearHighlights();
-                        }
-                    }
-                }, index * delay);
-            });
         }
 
         function isValidMove(oldRow, oldCol, newRow, newCol) {
@@ -629,19 +365,12 @@
                 // 检查是否有吃子机会
                 if (mustCapture()) {
                     // 在有吃子机会时，必须执行吃子移动
+                    let isValidCapture = false;
                     let foundOpponent = false;
                     const stepRow = rowDiff / Math.abs(rowDiff);
                     const stepCol = colDiff / Math.abs(colDiff);
                     
-                    // 首先验证这个移动是否是有效的吃子移动
-                    if (Math.abs(rowDiff) < 2 || Math.abs(colDiff) < 2) {
-                        console.log('Must make a capture move when capture is available');
-                        return false;
-                    }
-                    
                     // 检查路径上是否有且仅有一个对手的棋子
-                    let opponentRow = -1;
-                    let opponentCol = -1;
                     for (let i = 1; i < Math.abs(rowDiff); i++) {
                         const currentRow = oldRow + i * stepRow;
                         const currentCol = oldCol + i * stepCol;
@@ -650,8 +379,6 @@
                                 return false;
                             }
                             foundOpponent = true;
-                            opponentRow = currentRow;
-                            opponentCol = currentCol;
                         }
                     }
                     
@@ -661,45 +388,17 @@
                         return false;
                     }
 
-                    // 验证这个移动是否是当前可能的吃子移动之一
-                    const possibleCaptures = [];
-                    const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-                    for (const [dRow, dCol] of directions) {
-                        let checkRow = oldRow + dRow;
-                        let checkCol = oldCol + dCol;
-                        let foundTarget = false;
-                        
-                        while (checkRow >= 0 && checkRow < 10 && checkCol >= 0 && checkCol < 10) {
-                            if (board[checkRow][checkCol] !== null) {
-                                if (board[checkRow][checkCol].classList.contains(currentPlayer)) break;
-                                if (foundTarget) break;
-                                foundTarget = true;
-                                
-                                // 继续检查对手棋子后的所有空位
-                                let nextRow = checkRow + dRow;
-                                let nextCol = checkCol + dCol;
-                                while (nextRow >= 0 && nextRow < 10 && nextCol >= 0 && nextCol < 10) {
-                                    if (board[nextRow][nextCol] !== null) break;
-                                    possibleCaptures.push([nextRow, nextCol]);
-                                    nextRow += dRow;
-                                    nextCol += dCol;
-                                }
-                            }
-                            checkRow += dRow;
-                            checkCol += dCol;
+                    // 执行吃子移动
+                    for (let i = 1; i < Math.abs(rowDiff); i++) {
+                        const currentRow = oldRow + i * stepRow;
+                        const currentCol = oldCol + i * stepCol;
+                        if (board[currentRow][currentCol] !== null) {
+                            console.log(`Capturing piece at (${currentRow}, ${currentCol})`);
+                            board[currentRow][currentCol].remove();
+                            board[currentRow][currentCol] = null;
+                            break;
                         }
                     }
-                    
-                    // 检查目标位置是否在可能的吃子移动列表中
-                    const isValidCapture = possibleCaptures.some(([row, col]) => row === newRow && col === newCol);
-                    if (!isValidCapture) {
-                        console.log('Must make one of the available capture moves');
-                        return false;
-                    }
-
-                    // 执行吃子移动
-                    board[opponentRow][opponentCol].remove();
-                    board[opponentRow][opponentCol] = null;
                     return true;
                 } else {
                     // 没有吃子机会时的普通移动
@@ -747,66 +446,30 @@
             return false;
         }
 
-        function canCapture(row, col, isCheckingMultiple = false) {
+        function canCapture(row, col) {
             console.log(`Checking capture possibilities for piece at (${row}, ${col})`);
             const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
             const piece = board[row][col];
-            const capturePositions = [];
             
             if (piece.classList.contains('king')) {
                 for (const [dRow, dCol] of directions) {
                     let newRow = row + dRow;
                     let newCol = col + dCol;
                     let foundOpponent = false;
-                    let opponentRow = -1;
-                    let opponentCol = -1;
                     
                     while (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
                         if (board[newRow][newCol] !== null) {
                             if (board[newRow][newCol].classList.contains(currentPlayer)) break;
                             if (foundOpponent) break;
                             foundOpponent = true;
-                            opponentRow = newRow;
-                            opponentCol = newCol;
                             
-                            // 继续检查对手棋子后的空位
-                            let checkRow = newRow + dRow;
-                            let checkCol = newCol + dCol;
-                            while (checkRow >= 0 && checkRow < 10 && checkCol >= 0 && checkCol < 10) {
-                                if (board[checkRow][checkCol] !== null) break;
-                                capturePositions.push([checkRow, checkCol]);
-                                
-                                if (!isCheckingMultiple) {
-                                    // 临时保存当前状态
-                                    const originalBoard = board.map(row => [...row]);
-                                    
-                                    // 模拟吃子移动
-                                    board[opponentRow][opponentCol] = null;
-                                    board[row][col] = null;
-                                    board[checkRow][checkCol] = piece;
-                                    
-                                    // 检查是否可以继续吃子
-                                    if (canCapture(checkRow, checkCol, true)) {
-                                        const hintElement = document.getElementById('captureHint');
-                                        const pieceType = piece.classList.contains('white-piece') ? '白棋' : '黑棋';
-                                        const kingText = piece.classList.contains('king') ? '王' : '';
-                                        hintElement.textContent = `${pieceType}${kingText}可以连续吃子！`;
-                                        hintElement.classList.add('show');
-                                        setTimeout(() => {
-                                            hintElement.classList.remove('show');
-                                        }, 3000);
-                                    }
-                                    
-                                    // 恢复原始状态
-                                    board.forEach((row, i) => {
-                                        board[i] = [...originalBoard[i]];
-                                    });
-                                }
-                                
-                                checkRow += dRow;
-                                checkCol += dCol;
+                            const nextRow = newRow + dRow;
+                            const nextCol = newCol + dCol;
+                            if (nextRow >= 0 && nextRow < 10 && nextCol >= 0 && nextCol < 10 && 
+                                board[nextRow][nextCol] === null) {
+                                console.log(`King can capture from (${row}, ${col}) to (${nextRow}, ${nextCol})`);
+                                return true;
                             }
-                            break;
                         }
                         newRow += dRow;
                         newCol += dCol;
@@ -823,39 +486,14 @@
                         board[middleRow][middleCol] && 
                         !board[middleRow][middleCol].classList.contains(currentPlayer) && 
                         board[newRow][newCol] === null) {
-                        capturePositions.push([newRow, newCol]);
-                        if (!isCheckingMultiple) {
-                            // 临时保存当前状态
-                            const originalBoard = board.map(row => [...row]);
-                            const capturedPiece = board[middleRow][middleCol];
-                            
-                            // 模拟吃子移动
-                            board[middleRow][middleCol] = null;
-                            board[row][col] = null;
-                            board[newRow][newCol] = piece;
-                            
-                            // 检查是否可以继续吃子
-                            if (canCapture(newRow, newCol, true)) {
-                                const hintElement = document.getElementById('captureHint');
-                                const pieceType = piece.classList.contains('white-piece') ? '白棋' : '黑棋';
-                                const kingText = piece.classList.contains('king') ? '王' : '';
-                                hintElement.textContent = `${pieceType}${kingText}可以连续吃子！`;
-                                hintElement.classList.add('show');
-                                setTimeout(() => {
-                                    hintElement.classList.remove('show');
-                                }, 3000);
-                            }
-                            
-                            // 恢复原始状态
-                            board.forEach((row, i) => {
-                                board[i] = [...originalBoard[i]];
-                            });
-                        }
+                        console.log(`Regular piece can capture from (${row}, ${col}) to (${newRow}, ${newCol})`);
+                        return true;
                     }
                 }
             }
             
-            return capturePositions.length > 0;
+            console.log(`No capture possible for piece at (${row}, ${col})`);
+            return false;
         }
 
         function highlightMoves(row, col) {
@@ -866,58 +504,36 @@
             // 首先检查是否存在吃子机会
             if (piece.classList.contains('king')) {
                 // 王棋的吃子检查
-                if (mustCapture()) {
-                    // 如果必须吃子，只显示可以吃子的位置
-                    for (const [dRow, dCol] of directions) {
-                        let newRow = row + dRow;
-                        let newCol = col + dCol;
-                        let foundOpponent = false;
-                        
-                        while (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
-                            if (board[newRow][newCol] !== null) {
-                                if (board[newRow][newCol].classList.contains(currentPlayer)) break;
-                                if (foundOpponent) break;
-                                foundOpponent = true;
-                                
-                                // 检查对手棋子后的第一个空位
-                                const nextRow = newRow + dRow;
-                                const nextCol = newCol + dCol;
-                                if (nextRow >= 0 && nextRow < 10 && nextCol >= 0 && nextCol < 10 && 
-                                    board[nextRow][nextCol] === null) {
-                                    const square = document.querySelector(`[data-row='${nextRow}'][data-col='${nextCol}']`);
-                                    square.classList.add('highlight');
-                                    canCaptureMove = true;
-                                }
-                                break;
+                for (const [dRow, dCol] of directions) {
+                    let newRow = row + dRow;
+                    let newCol = col + dCol;
+                    let foundOpponent = false;
+                    
+                    while (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
+                        if (board[newRow][newCol] !== null) {
+                            if (board[newRow][newCol].classList.contains(currentPlayer)) break;
+                            if (foundOpponent) break;
+                            foundOpponent = true;
+                            
+                            // 检查对手棋子后的空位
+                            let nextRow = newRow + dRow;
+                            let nextCol = newCol + dCol;
+                            while (nextRow >= 0 && nextRow < 10 && nextCol >= 0 && nextCol < 10 && 
+                                   board[nextRow][nextCol] === null) {
+                                const square = document.querySelector(`[data-row='${nextRow}'][data-col='${nextCol}']`);
+                                square.classList.add('highlight');
+                                canCaptureMove = true;
+                                nextRow += dRow;
+                                nextCol += dCol;
                             }
-                            newRow += dRow;
-                            newCol += dCol;
+                            break;
                         }
-                    }
-                } else {
-                    // 没有吃子机会时的普通移动
-                    for (const [dRow, dCol] of directions) {
-                        let newRow = row + dRow;
-                        let newCol = col + dCol;
-                        let validPath = true;
-                        
-                        while (validPath && newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
-                            if (board[newRow][newCol] === null) {
-                                // 检查是否是有效的移动
-                                if (isValidMove(row, col, newRow, newCol)) {
-                                    const square = document.querySelector(`[data-row='${newRow}'][data-col='${newCol}']`);
-                                    square.classList.add('highlight');
-                                }
-                                newRow += dRow;
-                                newCol += dCol;
-                            } else {
-                                validPath = false;
-                            }
-                        }
+                        newRow += dRow;
+                        newCol += dCol;
                     }
                 }
             } else {
-                // 普通棋子的移动
+                // 普通棋子的吃子检查
                 for (const [dRow, dCol] of directions) {
                     const middleRow = row + dRow;
                     const middleCol = col + dCol;

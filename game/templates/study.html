@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}魔法课堂{% endblock %}
+
+{% block style %}
+.study-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+.course-list {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.course-list h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.course-categories {
+    margin-bottom: 20px;
+}
+
+.category-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.category-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.category-btn.active {
+    background: var(--primary-color);
+}
+
+.category-btn i {
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+.study-area {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.study-area h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.course-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.course-card .course-icon {
+    font-size: 2em;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.course-card h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.course-card .description {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.course-card .requirements {
+    font-size: 0.8em;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.course-card .progress-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.course-card .progress {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s;
+}
+
+.study-session {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+    background: var(--background-color);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.study-session.active {
+    display: block;
+}
+
+.study-session h3 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.study-content {
+    margin-bottom: 30px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.study-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.study-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.study-btn:hover {
+    background: var(--secondary-color);
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 999;
+}
+
+.overlay.active {
+    display: block;
+}
+{% endblock %}
+
+{% block content %}
+<div class="study-container">
+    <div class="course-list">
+        <h2>课程分类</h2>
+        <div class="course-categories">
+            <button class="category-btn active">
+                <i class="fas fa-book"></i>魔法基础
+            </button>
+            <button class="category-btn">
+                <i class="fas fa-wind"></i>风系魔法
+            </button>
+            <button class="category-btn">
+                <i class="fas fa-fire"></i>火系魔法
+            </button>
+            <button class="category-btn">
+                <i class="fas fa-tint"></i>水系魔法
+            </button>
+            <button class="category-btn">
+                <i class="fas fa-mountain"></i>土系魔法
+            </button>
+        </div>
+    </div>
+    
+    <div class="study-area">
+        <h2>魔法基础课程</h2>
+        <div class="course-grid">
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-hat-wizard"></i>
+                </div>
+                <h3>魔法入门</h3>
+                <div class="description">
+                    学习魔法的基本原理和施法技巧。
+                </div>
+                <div class="requirements">
+                    需求：等级 1
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 60%"></div>
+                </div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <h3>魔力控制</h3>
+                <div class="description">
+                    掌握魔力的基本运用方法。
+                </div>
+                <div class="requirements">
+                    需求：等级 2
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 30%"></div>
+                </div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>元素亲和</h3>
+                <div class="description">
+                    了解各种元素的特性和相互关系。
+                </div>
+                <div class="requirements">
+                    需求：等级 3
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="overlay"></div>
+<div class="study-session">
+    <h3>魔法入门</h3>
+    <div class="study-content">
+        <p>魔法是一种神奇的力量，它存在于世界的每个角落。作为一名魔法师，你需要学会感知和控制这种力量。</p>
+        <p>首先，让我们来学习如何感知魔力的存在...</p>
+    </div>
+    <div class="study-controls">
+        <button class="study-btn" onclick="startStudy()">开始学习</button>
+        <button class="study-btn" onclick="closeStudySession()">关闭</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+// 切换课程分类
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showMessage('切换到：' + btn.textContent.trim());
+    });
+});
+
+// 打开学习界面
+document.querySelectorAll('.course-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelector('.overlay').classList.add('active');
+        document.querySelector('.study-session').classList.add('active');
+    });
+});
+
+// 关闭学习界面
+function closeStudySession() {
+    document.querySelector('.overlay').classList.remove('active');
+    document.querySelector('.study-session').classList.remove('active');
+}
+
+// 开始学习
+function startStudy() {
+    const progress = document.querySelector('.study-session').querySelector('.progress');
+    progress.style.width = '0%';
+    
+    let width = 0;
+    const interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            showMessage('学习完成！获得经验值+100');
+            closeStudySession();
+        } else {
+            width += 1;
+            progress.style.width = width + '%';
+        }
+    }, 100);
+}
+
+// 点击遮罩层关闭
+document.querySelector('.overlay').addEventListener('click', closeStudySession);
+{% endblock %} 

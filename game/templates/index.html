@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+{% block style %}
+.hero {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.hero h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 40px 0;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2em;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.cta-button {
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.cta-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.cta-secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 2px solid var(--text-color);
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>欢迎来到魔法实验室</h1>
+    <p>在这里，你将成为一名出色的魔法师，探索神秘的魔法世界，制作强大的魔法道具。</p>
+    
+    {% if not current_user.is_authenticated %}
+    <div class="cta-buttons">
+        <a href="{{ url_for('login') }}" class="cta-button cta-primary">开始冒险</a>
+        <a href="{{ url_for('register') }}" class="cta-button cta-secondary">注册账号</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <i class="fas fa-hat-wizard"></i>
+        <h3>魔法学习</h3>
+        <p>学习各种强大的魔法，掌握元素之力。</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-flask"></i>
+        <h3>道具制作</h3>
+        <p>在实验室中制作独特的魔法道具。</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-dragon"></i>
+        <h3>冒险挑战</h3>
+        <p>与各种神奇生物战斗，提升实力。</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-store"></i>
+        <h3>商店交易</h3>
+        <p>购买材料，出售道具，赚取金币。</p>
+    </div>
+</div>
+{% endblock %} 

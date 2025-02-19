@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}注册{% endblock %}
+
+{% block style %}
+.register-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.register-container h2 {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.form-group input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: var(--secondary-color);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.character-preview {
+    text-align: center;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.character-preview h3 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.stat-item i {
+    color: var(--accent-color);
+    margin-right: 5px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <h2>注册新账号</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" required minlength="3" maxlength="20">
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required minlength="6">
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">确认密码</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+        
+        <div class="character-preview">
+            <h3>初始属性</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span><i class="fas fa-fist-raised"></i> 力量</span>
+                    <span>10</span>
+                </div>
+                <div class="stat-item">
+                    <span><i class="fas fa-running"></i> 敏捷</span>
+                    <span>10</span>
+                </div>
+                <div class="stat-item">
+                    <span><i class="fas fa-heart"></i> 体质</span>
+                    <span>10</span>
+                </div>
+                <div class="stat-item">
+                    <span><i class="fas fa-brain"></i> 智力</span>
+                    <span>10</span>
+                </div>
+                <div class="stat-item">
+                    <span><i class="fas fa-star"></i> 精神</span>
+                    <span>10</span>
+                </div>
+                <div class="stat-item">
+                    <span><i class="fas fa-crown"></i> 魅力</span>
+                    <span>10</span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">创建角色</button>
+    </form>
+    <div class="login-link">
+        已有账号？<a href="{{ url_for('login') }}">立即登录</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    
+    if (password !== confirmPassword) {
+        this.setCustomValidity('两次输入的密码不一致');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %} 
