@@ -84,11 +84,15 @@
             border-radius: 5px;
             background: #fff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        .current-player:hover {
+            background: #f5f5f5;
         }
         .restart-button, .edit-mode-button {
             padding: 12px 24px;
             font-size: 16px;
-            background: linear-gradient(145deg, #4CAF50, #45a049);
+            background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
             color: white;
             border: none;
             border-radius: 5px;
@@ -97,9 +101,12 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         .restart-button:hover, .edit-mode-button:hover {
-            background: linear-gradient(145deg, #45a049, #4CAF50);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .edit-mode-button.active {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
         }
         
         .edit-options {
@@ -130,27 +137,45 @@
         .edit-options button:hover {
             background: #45a049;
         }
+
+        .clear-board-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-left: 10px;
+        }
+        
+        .clear-board-button:hover {
+            background: linear-gradient(145deg, #cc0000, #ff4444);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>国际跳棋</h1>
         <div class="game-info">
-            <div class="current-player" id="currentPlayer">白方回合</div>
+            <div class="current-player" id="currentPlayer" onclick="toggleTurn()">白方回合</div>
             <button class="restart-button" onclick="restartGame()">重新开始</button>
-            <button class="edit-mode-button" onclick="toggleEditMode()">编辑模式</button>
+            <button class="edit-mode-button" onclick="toggleEditMode()">普通模式</button>
+            <button class="clear-board-button" onclick="clearBoard()">清除棋子</button>
         </div>
         <div class="board" id="board"></div>
         
         <!-- 添加编辑选项对话框 -->
         <div id="editOptions" class="edit-options">
             <button onclick="setSquareProperty(selectedRow, selectedCol, '空格')">空格</button>
-            <button onclick="setSquareProperty(selectedRow, selectedCol, '白棋')">白棋</button>
             <button onclick="setSquareProperty(selectedRow, selectedCol, '黑棋')">黑棋</button>
-            <button onclick="setSquareProperty(selectedRow, selectedCol, '白王')">白王</button>
             <button onclick="setSquareProperty(selectedRow, selectedCol, '黑王')">黑王</button>
-            <button onclick="setCurrentPlayer('white-piece')">白方回合</button>
-            <button onclick="setCurrentPlayer('black-piece')">黑方回合</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '白棋')">白棋</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '白王')">白王</button>
             <button onclick="hideEditOptions()">取消</button>
         </div>
     </div>
@@ -274,9 +299,22 @@
 
         function toggleEditMode() {
             editMode = !editMode;
-            const modeText = editMode ? "编辑模式开启" : "编辑模式关闭";
-            console.log(modeText);
-            alert(modeText);
+            const editButton = document.querySelector('.edit-mode-button');
+            
+            if (editMode) {
+                editButton.classList.add('active');
+                editButton.textContent = '编辑模式';
+                editButton.style.background = 'linear-gradient(145deg, #4CAF50, #45a049)';
+            } else {
+                editButton.classList.remove('active');
+                editButton.textContent = '普通模式';
+                editButton.style.background = 'linear-gradient(145deg, #2c2c2c, #1a1a1a)';
+            }
+            
+            // 清除选中状态和高亮
+            selectedPiece = null;
+            clearHighlights();
+            hideEditOptions();
         }
 
         function movePiece(row, col) {
@@ -581,6 +619,29 @@
         // 修改玩家回合显示的文本
         function updateCurrentPlayerText() {
             currentPlayerElement.textContent = currentPlayer === 'white-piece' ? "白方回合" : "黑方回合";
+        }
+
+        function clearBoard() {
+            if (confirm('确定要清除所有棋子吗？')) {
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        const square = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+                        if (board[row][col]) {
+                            square.innerHTML = '';
+                            board[row][col] = null;
+                        }
+                    }
+                }
+                selectedPiece = null;
+                clearHighlights();
+            }
+        }
+
+        function toggleTurn() {
+            if (editMode) {
+                currentPlayer = currentPlayer === 'white-piece' ? 'black-piece' : 'white-piece';
+                updateCurrentPlayerText();
+            }
         }
 
         createBoard();
