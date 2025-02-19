@@ -22,13 +22,13 @@
             grid-template-rows: repeat(10, 60px);
             gap: 0;
             margin-bottom: 20px;
-            border: 15px solid #DAA520;  /* 添加金色边框 */
+            border: 15px solid #DAA520;
             box-shadow: 
                 0 0 15px rgba(0, 0, 0, 0.2),
-                inset 0 0 8px rgba(0, 0, 0, 0.3);  /* 为边框添加内阴影 */
-            background: #DAA520;  /* 设置边框背景色 */
-            padding: 3px;  /* 在棋盘和边框之间添加间距 */
-            border-radius: 3px;  /* 略微圆角 */
+                inset 0 0 8px rgba(0, 0, 0, 0.3);
+            background: #DAA520;
+            padding: 3px;
+            border-radius: 3px;
         }
         .black, .white {
             width: 60px;
@@ -85,7 +85,7 @@
             background: #fff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        .restart-button {
+        .restart-button, .edit-mode-button {
             padding: 12px 24px;
             font-size: 16px;
             background: linear-gradient(145deg, #4CAF50, #45a049);
@@ -96,10 +96,39 @@
             transition: all 0.3s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        .restart-button:hover {
+        .restart-button:hover, .edit-mode-button:hover {
             background: linear-gradient(145deg, #45a049, #4CAF50);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .edit-options {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .edit-options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .edit-options button:hover {
+            background: #45a049;
         }
     </style>
 </head>
@@ -109,8 +138,21 @@
         <div class="game-info">
             <div class="current-player" id="currentPlayer">白方回合</div>
             <button class="restart-button" onclick="restartGame()">重新开始</button>
+            <button class="edit-mode-button" onclick="toggleEditMode()">编辑模式</button>
         </div>
         <div class="board" id="board"></div>
+        
+        <!-- 添加编辑选项对话框 -->
+        <div id="editOptions" class="edit-options">
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '空格')">空格</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '白棋')">白棋</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '黑棋')">黑棋</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '白王')">白王</button>
+            <button onclick="setSquareProperty(selectedRow, selectedCol, '黑王')">黑王</button>
+            <button onclick="setCurrentPlayer('white-piece')">白方回合</button>
+            <button onclick="setCurrentPlayer('black-piece')">黑方回合</button>
+            <button onclick="hideEditOptions()">取消</button>
+        </div>
     </div>
 
     <script>
@@ -119,6 +161,9 @@
         const board = [];
         let selectedPiece = null;
         let currentPlayer = 'white-piece';
+        let editMode = false;
+        let selectedRow, selectedCol;
+        const editOptionsElement = document.getElementById('editOptions');
 
         function createBoard() {
             for (let row = 0; row < 10; row++) {
@@ -155,21 +200,83 @@
         }
 
         function selectSquare(row, col) {
-            clearHighlights();
-            if (selectedPiece) {
-                console.log(`Attempting to move piece from (${selectedPiece.row}, ${selectedPiece.col}) to (${row}, ${col})`);
-                movePiece(row, col);
-            } else if (board[row][col] && board[row][col].classList.contains(currentPlayer)) {
-                if (mustCapture() && !canCapture(row, col)) {
-                    console.log(`Must capture, cannot select piece at (${row}, ${col})`);
-                    return;
-                }
-                selectedPiece = { piece: board[row][col], row, col };
-                highlightMoves(row, col);
-                console.log(`Selected piece at (${row}, ${col})`);
+            if (editMode) {
+                showEditOptions(row, col);
             } else {
-                console.log(`Invalid selection at (${row}, ${col})`);
+                clearHighlights();
+                if (selectedPiece) {
+                    console.log(`Attempting to move piece from (${selectedPiece.row}, ${selectedPiece.col}) to (${row}, ${col})`);
+                    movePiece(row, col);
+                } else if (board[row][col] && board[row][col].classList.contains(currentPlayer)) {
+                    if (mustCapture() && !canCapture(row, col)) {
+                        console.log(`Must capture, cannot select piece at (${row}, ${col})`);
+                        return;
+                    }
+                    selectedPiece = { piece: board[row][col], row, col };
+                    highlightMoves(row, col);
+                    console.log(`Selected piece at (${row}, ${col})`);
+                } else {
+                    console.log(`Invalid selection at (${row}, ${col})`);
+                }
             }
+        }
+
+        function showEditOptions(row, col) {
+            selectedRow = row;
+            selectedCol = col;
+            editOptionsElement.style.display = 'block';
+        }
+
+        function hideEditOptions() {
+            editOptionsElement.style.display = 'none';
+        }
+
+        function setCurrentPlayer(player) {
+            currentPlayer = player;
+            updateCurrentPlayerText();
+            hideEditOptions();
+        }
+
+        function setSquareProperty(row, col, property) {
+            const square = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+            square.innerHTML = '';
+            board[row][col] = null;
+
+            switch (property) {
+                case '白棋':
+                    const whitePiece = createPiece('white-piece');
+                    square.appendChild(whitePiece);
+                    board[row][col] = whitePiece;
+                    break;
+                case '黑棋':
+                    const blackPiece = createPiece('black-piece');
+                    square.appendChild(blackPiece);
+                    board[row][col] = blackPiece;
+                    break;
+                case '白王':
+                    const whiteKing = createPiece('white-piece');
+                    whiteKing.classList.add('king');
+                    square.appendChild(whiteKing);
+                    board[row][col] = whiteKing;
+                    break;
+                case '黑王':
+                    const blackKing = createPiece('black-piece');
+                    blackKing.classList.add('king');
+                    square.appendChild(blackKing);
+                    board[row][col] = blackKing;
+                    break;
+                case '空格':
+                default:
+                    break;
+            }
+            hideEditOptions();
+        }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            const modeText = editMode ? "编辑模式开启" : "编辑模式关闭";
+            console.log(modeText);
+            alert(modeText);
         }
 
         function movePiece(row, col) {
