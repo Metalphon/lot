@@ -1,0 +1,129 @@
+<!-- 主容器 -->
+<view class="container" style="{{_refresh ? '' : ''}}">
+  <!-- 系统切换按钮 -->
+  <view class="system-buttons">
+    <view class="system-btn {{currentSystem === 'biology' ? 'active' : ''}}" 
+          bindtap="switchSystem" data-system="biology">
+      <text>生物系统</text>
+    </view>
+    <view class="system-btn {{currentSystem === 'habitat' ? 'active' : ''}}" 
+          bindtap="switchSystem" data-system="habitat">
+      <text>栖息地系统</text>
+    </view>
+    <view class="system-btn" bindtap="switchSystem" data-system="system3">
+      <text>待定系统</text>
+    </view>
+    <view class="system-btn" bindtap="switchSystem" data-system="system4">
+      <text>待定系统</text>
+    </view>
+    <view class="system-btn" bindtap="switchSystem" data-system="system5">
+      <text>待定系统</text>
+    </view>
+  </view>
+
+  <!-- 生物系统 -->
+  <view class="resources" wx:if="{{currentSystem === 'biology'}}">
+    <!-- 原子核 -->
+    <view class="resource-card nucleus">
+      <view class="resource-info">
+        <view class="resource-name">原子核<text class="evolution-count">进化: {{gameState.evolutionCounts.nuclei}}</text></view>
+        <view class="resource-amount">{{displayData.nuclei}}</view>
+        <view class="resource-rate">{{productionRates.nuclei}}</view>
+      </view>
+      <view class="resource-actions">
+        <button class="action-btn" bindtap="buyResource" data-resource="nuclei">
+          购买 ({{prices.nuclei}}粒子)
+        </button>
+        <button class="auto-btn {{gameState.autoNucleus ? 'active' : ''}}" 
+                bindtap="toggleAuto" data-resource="nucleus">
+          自动
+        </button>
+        <button class="evolution-btn {{canEvolve.nuclei ? '' : 'disabled'}}" 
+                bindtap="evolveResource" data-resource="nuclei">
+          进化
+        </button>
+      </view>
+    </view>
+
+    <!-- 其他生物资源卡片 -->
+    <block wx:for="{{biologicalResources}}" wx:key="name">
+      <view class="resource-card {{item.class}}">
+        <view class="resource-info">
+          <view class="resource-name">{{item.name}}</view>
+          <view class="resource-amount">{{displayData[item.key]}}</view>
+          <view class="resource-rate">{{productionRates[item.key]}}</view>
+        </view>
+        <view class="resource-actions">
+          <button class="action-btn" bindtap="buyResource" data-resource="{{item.key}}">
+            购买 ({{prices[item.key]}}{{item.currency}})
+          </button>
+          <button class="auto-btn {{item.key == 'atoms' && gameState.autoAtoms ? 'active' : 
+                                  item.key == 'molecules' && gameState.autoMolecules ? 'active' : 
+                                  item.key == 'proteins' && gameState.autoProteins ? 'active' :
+                                  item.key == 'membrane' && gameState.autoMembrane ? 'active' :
+                                  item.key == 'cells' && gameState.autoCells ? 'active' :
+                                  item.key == 'organisms' && gameState.autoOrganisms ? 'active' :
+                                  item.key == 'worms' && gameState.autoWorms ? 'active' :
+                                  item.key == 'fish' && gameState.autoFish ? 'active' :
+                                  item.key == 'animals' && gameState.autoAnimals ? 'active' :
+                                  item.key == 'mammals' && gameState.autoMammals ? 'active' :
+                                  item.key == 'apes' && gameState.autoApes ? 'active' :
+                                  item.key == 'humans' && gameState.autoHumans ? 'active' : ''}}" 
+                  bindtap="toggleAuto" data-resource="{{item.key}}">
+            自动
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 栖息地系统 -->
+  <view class="habitat-system" wx:if="{{currentSystem === 'habitat'}}">
+    <block wx:for="{{habitatResources}}" wx:key="name">
+      <view class="resource-card {{item.class}}">
+        <view class="resource-info">
+          <view class="resource-name">{{item.name}}</view>
+          <view class="resource-amount">{{displayData[item.key]}}</view>
+          <view class="resource-rate">{{productionRates[item.key]}}领土/秒</view>
+        </view>
+        <view class="resource-actions">
+          <button class="action-btn" bindtap="buyHabitat" data-resource="{{item.key}}">
+            购买 ({{prices[item.key]}}粒子)
+          </button>
+          <button class="auto-btn {{item.key == 'stone' && gameState.autoStone ? 'active' : 
+                                  item.key == 'mountain' && gameState.autoMountain ? 'active' : 
+                                  item.key == 'continent' && gameState.autoContinent ? 'active' :
+                                  item.key == 'planet' && gameState.autoPlanet ? 'active' :
+                                  item.key == 'star' && gameState.autoStar ? 'active' :
+                                  item.key == 'galaxy' && gameState.autoGalaxy ? 'active' :
+                                  item.key == 'cluster' && gameState.autoCluster ? 'active' :
+                                  item.key == 'blackhole' && gameState.autoBlackhole ? 'active' : ''}}" 
+                  bindtap="toggleAutoHabitat" data-resource="{{item.key}}">
+            自动
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部资源栏 -->
+  <view class="particle-container">
+    <view class="currency-container">
+      <view class="resource-card particle">
+        <view class="resource-info">
+          <view class="resource-name">粒子</view>
+          <view class="resource-amount">{{displayData.particles}}</view>
+          <view class="resource-rate">{{productionRates.particles}}/秒</view>
+        </view>
+      </view>
+      <view class="resource-card territory">
+        <view class="resource-info">
+          <view class="resource-name">领土</view>
+          <view class="resource-amount">{{displayData.territory}}</view>
+          <view class="resource-rate">{{productionRates.territory}}/秒</view>
+        </view>
+      </view>
+    </view>
+    <button class="time-btn" bindtap="skipTime">时间加速(+100s)</button>
+  </view>
+</view> 

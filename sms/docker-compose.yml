@@ -1,0 +1,21 @@
+version: '3'
+services:
+  api_gateway:
+    build: ./gateway
+    ports:
+      - "80:80"
+    
+  number_pool:
+    build: ./number_pool
+    environment:
+      - REDIS_HOST=redis
+    
+  sms_receiver:
+    build: ./sms_receiver
+    depends_on:
+      - redis
+    
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379" 

@@ -1,0 +1,196 @@
+/* 主题颜色变量 */
+page {
+  --primary-color: #1a1a2e;
+  --secondary-color: #16213e;
+  --accent-color: #0f3460;
+  --text-color: #e94560;
+  --particle-color: #00ff9d;
+  --nucleus-color: #ff9d00;
+  --atom-color: #9d00ff;
+  --molecule-color: #ff0099;
+  --protein-color: #99ff00;
+  --membrane-color: #00ff99;
+  --cell-color: #00ffff;
+  --organism-color: #ffff00;
+  --worm-color: #ff9900;
+  --fish-color: #00ffcc;
+  --animal-color: #ff4444;
+  --mammal-color: #44ff88;
+  --ape-color: #8844ff;
+  --human-color: #44ff44;
+}
+
+.container {
+  padding: 20rpx;
+  background-color: var(--primary-color);
+  min-height: 100vh;
+}
+
+.system-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+  padding: 10rpx;
+  background: var(--secondary-color);
+  border-radius: 10rpx;
+}
+
+.system-btn {
+  flex: 1;
+  min-width: 150rpx;
+  padding: 15rpx 20rpx;
+  text-align: center;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.system-btn.active {
+  background: var(--text-color);
+}
+
+.resources, .habitat-system {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-bottom: 120rpx;
+}
+
+.resource-card {
+  background: var(--accent-color);
+  padding: 20rpx;
+  border-radius: 10rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 资源卡片边框颜色 */
+.resource-card.nucleus { border-left: 8rpx solid var(--nucleus-color); }
+.resource-card.atom { border-left: 8rpx solid var(--atom-color); }
+.resource-card.molecule { border-left: 8rpx solid var(--molecule-color); }
+.resource-card.protein { border-left: 8rpx solid var(--protein-color); }
+.resource-card.membrane { border-left: 8rpx solid var(--membrane-color); }
+.resource-card.cell { border-left: 8rpx solid var(--cell-color); }
+.resource-card.organism { border-left: 8rpx solid var(--organism-color); }
+.resource-card.worm { border-left: 8rpx solid var(--worm-color); }
+.resource-card.fish { border-left: 8rpx solid var(--fish-color); }
+.resource-card.animal { border-left: 8rpx solid var(--animal-color); }
+.resource-card.mammal { border-left: 8rpx solid var(--mammal-color); }
+.resource-card.ape { border-left: 8rpx solid var(--ape-color); }
+.resource-card.human { border-left: 8rpx solid var(--human-color); }
+
+.resource-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.resource-name {
+  font-size: 32rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.evolution-count {
+  font-size: 24rpx;
+  color: #4CAF50;
+  margin-left: 16rpx;
+}
+
+.resource-amount {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--particle-color);
+}
+
+.resource-rate {
+  font-size: 26rpx;
+  color: #aaaaaa;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 10rpx;
+}
+
+.action-btn {
+  min-width: 200rpx;
+  background: #666666;
+  color: white;
+  padding: 15rpx 20rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  opacity: 0.6;
+}
+
+.action-btn:not([disabled]) {
+  background: #4CAF50;
+  opacity: 1;
+}
+
+.auto-btn {
+  width: 80rpx;
+  background: #666666;
+  color: white;
+  padding: 15rpx 10rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.auto-btn.active {
+  background: #4CAF50;
+  opacity: 1;
+  font-weight: bold;
+  box-shadow: 0 0 10rpx rgba(76, 175, 80, 0.5);
+}
+
+.evolution-btn {
+  width: 80rpx;
+  background: #666666;
+  color: white;
+  padding: 15rpx 10rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.evolution-btn:not(.disabled) {
+  background: #4CAF50;
+  opacity: 1;
+}
+
+.particle-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background: var(--accent-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 -5rpx 20rpx rgba(0, 0, 0, 0.3);
+}
+
+.currency-container {
+  display: flex;
+  gap: 20rpx;
+}
+
+.time-btn {
+  background: var(--text-color);
+  color: white;
+  padding: 15rpx 30rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+} 

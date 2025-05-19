@@ -13,13 +13,27 @@
             --particle-color: #00ff9d;
             --nucleus-color: #ff9d00;
             --atom-color: #9d00ff;
-            --dna-color: #ff0099;
+            --molecule-color: #ff0099;
+            --protein-color: #99ff00;
+            --membrane-color: #00ff99;
+            --cell-color: #00ffff;
+            --organism-color: #ffff00;
+            --worm-color: #ff9900;
+            --fish-color: #00ffcc;
+            --animal-color: #ff4444;
+            --mammal-color: #44ff88;
+            --ape-color: #8844ff;
+            --human-color: #44ff44;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            overflow-y: scroll;
         }
 
         body {
@@ -31,15 +45,18 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .game-container {
-            width: 100%;
+            width: 600px;
+            min-width: 600px;
             max-width: 600px;
             background: var(--secondary-color);
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 120px;
         }
 
         .resources {
@@ -56,7 +73,7 @@
             position: relative;
             overflow: hidden;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 300px 200px;
             align-items: center;
             gap: 15px;
         }
@@ -64,7 +81,17 @@
         .resource-card.particle { border-left: 4px solid var(--particle-color); }
         .resource-card.nucleus { border-left: 4px solid var(--nucleus-color); }
         .resource-card.atom { border-left: 4px solid var(--atom-color); }
-        .resource-card.dna { border-left: 4px solid var(--dna-color); }
+        .resource-card.molecule { border-left: 4px solid var(--molecule-color); }
+        .resource-card.cell { border-left: 4px solid var(--cell-color); }
+        .resource-card.organism { border-left: 4px solid var(--organism-color); }
+        .resource-card.animal { border-left: 4px solid var(--animal-color); }
+        .resource-card.human { border-left: 4px solid var(--human-color); }
+        .resource-card.protein { border-left: 4px solid var(--protein-color); }
+        .resource-card.membrane { border-left: 4px solid var(--membrane-color); }
+        .resource-card.worm { border-left: 4px solid var(--worm-color); }
+        .resource-card.fish { border-left: 4px solid var(--fish-color); }
+        .resource-card.mammal { border-left: 4px solid var(--mammal-color); }
+        .resource-card.ape { border-left: 4px solid var(--ape-color); }
 
         .resource-info {
             display: flex;
@@ -80,20 +107,64 @@
             gap: 8px;
         }
 
+        .evolution-count {
+            font-size: 0.8em;
+            color: #4CAF50;
+            margin-left: 8px;
+        }
+
+        .evolution-btn {
+            width: 40px;
+            background: #666666;
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .evolution-btn:not(:disabled) {
+            background: #4CAF50;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .evolution-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
         .resource-amount {
             font-size: 1.8em;
             font-weight: bold;
             color: var(--particle-color);
+            width: 120px;
+            text-align: right;
         }
 
         .particle .resource-amount { color: var(--particle-color); }
         .nucleus .resource-amount { color: var(--nucleus-color); }
         .atom .resource-amount { color: var(--atom-color); }
-        .dna .resource-amount { color: var(--dna-color); }
+        .molecule .resource-amount { color: var(--molecule-color); }
+        .cell .resource-amount { color: var(--cell-color); }
+        .organism .resource-amount { color: var(--organism-color); }
+        .animal .resource-amount { color: var(--animal-color); }
+        .human .resource-amount { color: var(--human-color); }
+        .protein .resource-amount { color: var(--protein-color); }
+        .membrane .resource-amount { color: var(--membrane-color); }
+        .worm .resource-amount { color: var(--worm-color); }
+        .fish .resource-amount { color: var(--fish-color); }
+        .mammal .resource-amount { color: var(--mammal-color); }
+        .ape .resource-amount { color: var(--ape-color); }
 
         .resource-rate {
             font-size: 0.9em;
             color: #aaa;
+            width: 80px;
+            text-align: right;
         }
 
         .resource-actions {
@@ -102,25 +173,46 @@
         }
 
         .action-btn {
-            background: var(--text-color);
+            width: 150px;
+            background: #666666;  /* 默认为灰色 */
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 15px;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
+            cursor: not-allowed;  /* 默认不可点击 */
+            font-size: 0.9em;
             transition: all 0.3s ease;
             white-space: nowrap;
+            opacity: 0.6;
         }
 
-        .action-btn:disabled {
-            background: #666;
-            cursor: not-allowed;
+        .action-btn:not(:disabled) {
+            background: #4CAF50;  /* 可购买时为绿色 */
+            cursor: pointer;
+            opacity: 1;
         }
 
-        .action-btn:not(:disabled):hover {
+        .auto-btn {
+            width: 40px;
+            background: #666666;  /* 默认为灰色 */
+            color: white;
+            border: 1px solid var(--text-color);
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .auto-btn.active {
+            background: #4CAF50;  /* 激活时为绿色 */
+            opacity: 1;
+        }
+
+        .action-btn:not(:disabled):hover, .auto-btn:not(:disabled):hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
         }
 
         .stats {
@@ -178,28 +270,217 @@
         .tooltip.show {
             opacity: 1;
         }
+
+        .particle-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            padding: 20px;
+            background: var(--accent-color);
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .currency-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .particle-container .resource-card {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        .time-btn {
+            background: var(--text-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-color);
+        }
+
+        .switch-view-btn {
+            background: var(--text-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .switch-view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .habitat-system {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .habitat-system.active {
+            display: flex;
+        }
+
+        .habitat-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .habitat-card {
+            background: var(--accent-color);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .habitat-card h3 {
+            color: var(--text-color);
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .habitat-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .habitat-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stone { border-left: 4px solid #808080; }
+        .mountain { border-left: 4px solid #a0522d; }
+        .continent { border-left: 4px solid #8b4513; }
+        .planet { border-left: 4px solid #4169e1; }
+        .star { border-left: 4px solid #ffd700; }
+        .galaxy { border-left: 4px solid #9370db; }
+        .cluster { border-left: 4px solid #4b0082; }
+        .blackhole { border-left: 4px solid #000000; }
+        .territory { border-left: 4px solid #32cd32; }
+
+        .stone .resource-amount { color: #808080; }
+        .mountain .resource-amount { color: #a0522d; }
+        .continent .resource-amount { color: #8b4513; }
+        .planet .resource-amount { color: #4169e1; }
+        .star .resource-amount { color: #ffd700; }
+        .galaxy .resource-amount { color: #9370db; }
+        .cluster .resource-amount { color: #4b0082; }
+        .blackhole .resource-amount { color: #000000; }
+        .territory .resource-amount { color: #32cd32; }
+
+        .territory-container {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            padding: 20px;
+            background: var(--accent-color);
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .system-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .system-btn {
+            background: var(--accent-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .system-btn i {
+            font-size: 1.1em;
+        }
+
+        .system-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .system-btn.active {
+            background: var(--text-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="resources">
-            <div class="resource-card particle">
-                <div class="resource-info">
-                    <div class="resource-name">粒子</div>
-                    <div class="resource-amount" id="particleCount">10</div>
-                    <div class="resource-rate" id="particleRate">+0/秒</div>
-                </div>
-            </div>
-
             <div class="resource-card nucleus">
                 <div class="resource-info">
-                    <div class="resource-name">原子核</div>
+                    <div class="resource-name">原子核<span class="evolution-count" id="nucleusEvolutionCount">进化: 0</span></div>
                     <div class="resource-amount" id="nucleusCount">0</div>
                     <div class="resource-rate" id="nucleusRate">+0/秒</div>
                 </div>
                 <div class="resource-actions">
                     <button class="action-btn" id="buyNucleusBtn">
-                        购买 (10粒子)
+                        购买 (1e1粒子)
+                    </button>
+                    <button class="auto-btn" id="autoNucleusBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                    <button class="evolution-btn" id="evolveNucleusBtn" title="消耗领土进化">
+                        E
                     </button>
                 </div>
             </div>
@@ -212,93 +493,1343 @@
                 </div>
                 <div class="resource-actions">
                     <button class="action-btn" id="buyAtomBtn">
-                        购买 (50粒子)
+                        购买 (1e2原子核)
+                    </button>
+                    <button class="auto-btn" id="autoAtomBtn" title="自动购买最大数量">
+                        A
                     </button>
                 </div>
             </div>
 
-            <div class="resource-card dna">
+            <div class="resource-card molecule">
                 <div class="resource-info">
-                    <div class="resource-name">DNA</div>
-                    <div class="resource-amount" id="dnaCount">0</div>
-                    <div class="resource-rate" id="dnaRate">+0/秒</div>
+                    <div class="resource-name">分子</div>
+                    <div class="resource-amount" id="moleculeCount">0</div>
+                    <div class="resource-rate" id="moleculeRate">+0/秒</div>
                 </div>
                 <div class="resource-actions">
-                    <button class="action-btn" id="buyDnaBtn">
-                        购买 (200粒子)
+                    <button class="action-btn" id="buyMoleculeBtn">
+                        购买 (1e3原子)
+                    </button>
+                    <button class="auto-btn" id="autoMoleculeBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card protein">
+                <div class="resource-info">
+                    <div class="resource-name">蛋白质</div>
+                    <div class="resource-amount" id="proteinCount">0</div>
+                    <div class="resource-rate" id="proteinRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyProteinBtn">
+                        购买 (1e5分子)
+                    </button>
+                    <button class="auto-btn" id="autoProteinBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card membrane">
+                <div class="resource-info">
+                    <div class="resource-name">细胞膜</div>
+                    <div class="resource-amount" id="membraneCount">0</div>
+                    <div class="resource-rate" id="membraneRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyMembraneBtn">
+                        购买 (1e9蛋白质)
+                    </button>
+                    <button class="auto-btn" id="autoMembraneBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card cell">
+                <div class="resource-info">
+                    <div class="resource-name">细胞</div>
+                    <div class="resource-amount" id="cellCount">0</div>
+                    <div class="resource-rate" id="cellRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyCellBtn">
+                        购买 (1e14细胞膜)
+                    </button>
+                    <button class="auto-btn" id="autoCellBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card organism">
+                <div class="resource-info">
+                    <div class="resource-name">微生物</div>
+                    <div class="resource-amount" id="organismCount">0</div>
+                    <div class="resource-rate" id="organismRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyOrganismBtn">
+                        购买 (1e18细胞)
+                    </button>
+                    <button class="auto-btn" id="autoOrganismBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card worm">
+                <div class="resource-info">
+                    <div class="resource-name">蠕虫</div>
+                    <div class="resource-amount" id="wormCount">0</div>
+                    <div class="resource-rate" id="wormRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyWormBtn">
+                        购买 (1e21微生物)
+                    </button>
+                    <button class="auto-btn" id="autoWormBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card fish">
+                <div class="resource-info">
+                    <div class="resource-name">鱼类</div>
+                    <div class="resource-amount" id="fishCount">0</div>
+                    <div class="resource-rate" id="fishRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyFishBtn">
+                        购买 (1e30蠕虫)
+                    </button>
+                    <button class="auto-btn" id="autoFishBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card animal">
+                <div class="resource-info">
+                    <div class="resource-name">动物</div>
+                    <div class="resource-amount" id="animalCount">0</div>
+                    <div class="resource-rate" id="animalRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyAnimalBtn">
+                        购买 (1e35鱼类)
+                    </button>
+                    <button class="auto-btn" id="autoAnimalBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card mammal">
+                <div class="resource-info">
+                    <div class="resource-name">哺乳动物</div>
+                    <div class="resource-amount" id="mammalCount">0</div>
+                    <div class="resource-rate" id="mammalRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyMammalBtn">
+                        购买 (1e37动物)
+                    </button>
+                    <button class="auto-btn" id="autoMammalBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card ape">
+                <div class="resource-info">
+                    <div class="resource-name">灵长类</div>
+                    <div class="resource-amount" id="apeCount">0</div>
+                    <div class="resource-rate" id="apeRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyApeBtn">
+                        购买 (1e40哺乳动物)
+                    </button>
+                    <button class="auto-btn" id="autoApeBtn" title="自动购买最大数量">
+                        A
+                    </button>
+                </div>
+            </div>
+
+            <div class="resource-card human">
+                <div class="resource-info">
+                    <div class="resource-name">智慧生命</div>
+                    <div class="resource-amount" id="humanCount">0</div>
+                    <div class="resource-rate" id="humanRate">+0/秒</div>
+                </div>
+                <div class="resource-actions">
+                    <button class="action-btn" id="buyHumanBtn">
+                        购买 (1e45灵长类)
+                    </button>
+                    <button class="auto-btn" id="autoHumanBtn" title="自动购买最大数量">
+                        A
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-item">
-                <span>总计生产的粒子</span>
-                <span id="totalParticles">10</span>
+        <div class="particle-container">
+            <div class="system-buttons">
+                <button class="system-btn active" data-system="biology">
+                    <i class="fas fa-dna"></i>
+                    生物系统
+                </button>
+                <button class="system-btn" data-system="habitat">
+                    <i class="fas fa-globe"></i>
+                    栖息地
+                </button>
+                <button class="system-btn" data-system="system3">
+                    <i class="fas fa-question"></i>
+                    待定系统
+                </button>
+                <button class="system-btn" data-system="system4">
+                    <i class="fas fa-question"></i>
+                    待定系统
+                </button>
+                <button class="system-btn" data-system="system5">
+                    <i class="fas fa-question"></i>
+                    待定系统
+                </button>
             </div>
-            <div class="stat-item">
-                <span>生产效率</span>
-                <span id="currentEfficiency">100%</span>
+            <div class="currency-container">
+                <div class="resource-card particle">
+                    <div class="resource-info">
+                        <div class="resource-name">粒子</div>
+                        <div class="resource-amount" id="particleCount">10</div>
+                        <div class="resource-rate" id="particleRate">+0/秒</div>
+                    </div>
+                </div>
+                <div class="resource-card territory">
+                    <div class="resource-info">
+                        <div class="resource-name">领土</div>
+                        <div class="resource-amount" id="territoryCount">0</div>
+                        <div class="resource-rate" id="territoryRate">+0/秒</div>
+                    </div>
+                </div>
+            </div>
+            <button class="time-btn" id="timeSkipBtn">时间加速(+100s)</button>
+        </div>
+
+        <div class="habitat-system">
+            <div class="habitat-grid">
+                <div class="resource-card stone">
+                    <div class="resource-info">
+                        <div class="resource-name">石头</div>
+                        <div class="resource-amount" id="stoneCount">0</div>
+                        <div class="resource-rate" id="stoneRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyStoneBtn">购买 (1e2粒子)</button>
+                        <button class="auto-btn" id="autoStoneBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card mountain">
+                    <div class="resource-info">
+                        <div class="resource-name">山脉</div>
+                        <div class="resource-amount" id="mountainCount">0</div>
+                        <div class="resource-rate" id="mountainRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyMountainBtn">购买 (1e7粒子)</button>
+                        <button class="auto-btn" id="autoMountainBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card continent">
+                    <div class="resource-info">
+                        <div class="resource-name">大陆</div>
+                        <div class="resource-amount" id="continentCount">0</div>
+                        <div class="resource-rate" id="continentRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyContinentBtn">购买 (1e14粒子)</button>
+                        <button class="auto-btn" id="autoContinentBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card planet">
+                    <div class="resource-info">
+                        <div class="resource-name">行星</div>
+                        <div class="resource-amount" id="planetCount">0</div>
+                        <div class="resource-rate" id="planetRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyPlanetBtn">购买 (1e20粒子)</button>
+                        <button class="auto-btn" id="autoPlanetBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card star">
+                    <div class="resource-info">
+                        <div class="resource-name">恒星</div>
+                        <div class="resource-amount" id="starCount">0</div>
+                        <div class="resource-rate" id="starRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyStarBtn">购买 (1e25粒子)</button>
+                        <button class="auto-btn" id="autoStarBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card galaxy">
+                    <div class="resource-info">
+                        <div class="resource-name">星系</div>
+                        <div class="resource-amount" id="galaxyCount">0</div>
+                        <div class="resource-rate" id="galaxyRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyGalaxyBtn">购买 (1e28粒子)</button>
+                        <button class="auto-btn" id="autoGalaxyBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card cluster">
+                    <div class="resource-info">
+                        <div class="resource-name">星系团</div>
+                        <div class="resource-amount" id="clusterCount">0</div>
+                        <div class="resource-rate" id="clusterRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyClusterBtn">购买 (1e32粒子)</button>
+                        <button class="auto-btn" id="autoClusterBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
+
+                <div class="resource-card blackhole">
+                    <div class="resource-info">
+                        <div class="resource-name">黑洞</div>
+                        <div class="resource-amount" id="blackholeCount">0</div>
+                        <div class="resource-rate" id="blackholeRate">+0领土/秒</div>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="action-btn" id="buyBlackholeBtn">购买 (1e35粒子)</button>
+                        <button class="auto-btn" id="autoBlackholeBtn" title="自动购买最大数量">A</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let gameState = {
-            particles: 10,
+            particles: 10,  // 初始粒子数量改为1000
             nuclei: 0,
             atoms: 0,
-            dna: 0,
-            totalParticles: 10,
+            molecules: 0,
+            proteins: 0,    // 添加蛋白质数量
+            membrane: 0,    // 添加细胞膜数量
+            cells: 0,
+            organisms: 0,
+            worms: 0,      // 添加蠕虫数量
+            fish: 0,       // 添加鱼类数量
+            animals: 0,
+            mammals: 0,    // 添加哺乳动物数量
+            apes: 0,       // 添加灵长类数量
+            humans: 0,
             lastTick: Date.now(),
             
-            // 基础产出率
-            nucleusProductionRate: 1,    // 每个原子核每秒产生的粒子
-            atomProductionRate: 0.2,     // 每个原子每秒产生的原子核
-            dnaProductionRate: 0.1,      // 每个DNA每秒产生的原子
+            // 进化相关状态
+            evolutionCounts: {
+                nuclei: 0,
+                atoms: 0,
+                molecules: 0,
+                proteins: 0,
+                membrane: 0,
+                cells: 0,
+                organisms: 0,
+                worms: 0,
+                fish: 0,
+                animals: 0,
+                mammals: 0,
+                apes: 0,
+                humans: 0
+            },
             
+            // 自动购买状态
+            autoNucleus: false,
+            autoAtom: false,
+            autoMolecule: false,
+            autoProtein: false,  // 添加蛋白质自动购买状态
+            autoMembrane: false, // 添加细胞膜自动购买状态
+            autoCell: false,
+            autoOrganism: false,
+            autoWorm: false,     // 添加蠕虫自动购买状态
+            autoFish: false,     // 添加鱼类自动购买状态
+            autoAnimal: false,
+            autoMammal: false,   // 添加哺乳动物自动购买状态
+            autoApe: false,      // 添加灵长类自动购买状态
+            autoHuman: false,
+            
+            // 基础产出率（每个生物每秒产生的下一级生物数量）
+            humanProductionRate: 1,      // 智慧生命
+            apeProductionRate: 1,        // 灵长类
+            mammalProductionRate: 1,     // 哺乳动物
+            animalProductionRate: 1,     // 脊椎动物
+            fishProductionRate: 1,       // 鱼类
+            wormProductionRate: 1,       // 蠕虫
+            organismProductionRate: 1,    // 多细胞生物
+            cellProductionRate: 1,        // 真核细胞
+            membraneProductionRate: 1,    // 细胞膜
+            proteinProductionRate: 1,     // 蛋白质
+            moleculeProductionRate: 1,    // 有机分子
+            atomProductionRate: 1,        // 原子
+            nucleusProductionRate: 1,     // 原子核
+            
+            // 生产折损相关参数
+            baseEfficiency: 1.0,
+            efficiencyDropStart: 100,      // 从100个开始衰减
+            minEfficiency: 0.30,           // 最低效率30%
+            
+            // 价格（以低级生物为单位）
+            nucleusPrice: 1e1,             // 1000粒子
+            atomPrice: 1e2,                // 1百万原子核
+            moleculePrice: 1e3,            // 10亿原子
+            proteinPrice: 1e5,            // 1万亿分子
+            membranePrice: 1e9,           // 1000万亿蛋白质
+            cellPrice: 1e14,               // 100万亿细胞膜
+            organismPrice: 1e18,           // 1亿万亿细胞
+            wormPrice: 1e21,               // 1万亿万亿多细胞生物
+            fishPrice: 1e30,               // 1000万亿万亿蠕虫
+            animalPrice: 1e35,             // 100万亿万亿鱼类
+            mammalPrice: 1e37,             // 1亿亿万亿动物
+            apePrice: 1e40,                // 10000亿亿万亿哺乳动物
+            humanPrice: 1e45,              // 1000万亿亿万亿灵长类
+            
+            // 栖息地系统
+            stone: 0,                    // 石头(1e50智慧生命)
+            mountain: 0,                 // 山脉(1e55石头)
+            continent: 0,                // 大陆(1e60山脉)
+            planet: 0,                   // 行星(1e65大陆)
+            star: 0,                     // 恒星(1e70行星)
+            galaxy: 0,                   // 星系(1e75恒星)
+            cluster: 0,                  // 星团(1e80星系)
+            blackhole: 0,                // 黑洞(1e85星团)
+            territory: 0,                // 领地(1e90黑洞)
+
+            // 自动购买状态
+            autoStone: false,
+            autoMountain: false,
+            autoContinent: false,
+            autoPlanet: false,
+            autoStar: false,
+            autoGalaxy: false,
+            autoCluster: false,
+            autoBlackhole: false,
+
+            // 基础产出率
+            stoneProductionRate: 1,
+            mountainProductionRate: 1,
+            continentProductionRate: 1,
+            planetProductionRate: 1,
+            starProductionRate: 1,
+            galaxyProductionRate: 1,
+            clusterProductionRate: 1,
+            blackholeProductionRate: 1,
+
             // 价格
-            nucleusPrice: 10,            // 原子核价格（粒子）
-            atomPrice: 50,               // 原子价格（粒子）
-            dnaPrice: 200,               // DNA价格（粒子）
+            stonePrice: 1e2,              // 1e16智慧生命
+            mountainPrice: 1e7,            // 1e17石头
+            continentPrice: 1e14,           // 1e18山脉
+            planetPrice: 1e20,              // 1e19大陆
+            starPrice: 1e25,                // 1e20行星
+            galaxyPrice: 1e28,              // 1e21恒星
+            clusterPrice: 1e32,             // 1e22星系
+            blackholePrice: 1e35,           // 1e23星团
+            territoryPrice: 1e40,           // 1e24黑洞
+
+            // 栖息地生产率
+            stoneProductionRate: 1,         // 石头
+            mountainProductionRate: 1,       // 山脉
+            continentProductionRate: 1,      // 大陆
+            planetProductionRate: 1,         // 行星
+            starProductionRate: 1,           // 恒星
+            galaxyProductionRate: 1,         // 星系
+            clusterProductionRate: 1,        // 星团
+            blackholeProductionRate: 1,      // 黑洞
+            territoryProductionRate: 1,      // 领地
         };
 
-        function updateDisplay() {
-            // 更新资源数量
-            document.getElementById('particleCount').textContent = Math.floor(gameState.particles);
-            document.getElementById('nucleusCount').textContent = Math.floor(gameState.nuclei);
-            document.getElementById('atomCount').textContent = Math.floor(gameState.atoms);
-            document.getElementById('dnaCount').textContent = Math.floor(gameState.dna);
+        // 数字格式化函数
+        function formatNumber(num) {
+            if (isNaN(num) || !isFinite(num)) return '0';
+            if (num < 0) return '0';
             
-            // 更新产出率
-            const nucleusEfficiency = calculateEfficiency(gameState.nuclei);
-            const atomEfficiency = calculateEfficiency(gameState.atoms);
-            const dnaEfficiency = calculateEfficiency(gameState.dna);
+            // 处理小数字
+            if (num < 1e3) return Math.floor(num).toString();
             
-            const particleRate = gameState.nuclei * gameState.nucleusProductionRate * nucleusEfficiency;
-            const nucleusRate = gameState.atoms * gameState.atomProductionRate * atomEfficiency;
-            const atomRate = gameState.dna * gameState.dnaProductionRate * dnaEfficiency;
+            // 处理大数字
+            const exp = Math.floor(Math.log10(num));
+            if (exp > 1e308) return 'Infinity';
             
-            document.getElementById('particleRate').textContent = `+${particleRate.toFixed(1)}/秒`;
-            document.getElementById('nucleusRate').textContent = `+${nucleusRate.toFixed(1)}/秒`;
-            document.getElementById('atomRate').textContent = `+${atomRate.toFixed(1)}/秒`;
+            // 对于非常大的数字，只显示科学计数法
+            if (exp >= 4) {
+                const mantissa = num / Math.pow(10, exp);
+                return `${Math.floor(mantissa)}e${exp}`;
+            }
             
-            // 更新总计和效率
-            document.getElementById('totalParticles').textContent = Math.floor(gameState.totalParticles);
-            document.getElementById('currentEfficiency').textContent = 
-                `${(nucleusEfficiency * 100).toFixed(1)}% / ${(atomEfficiency * 100).toFixed(1)}% / ${(dnaEfficiency * 100).toFixed(1)}%`;
-            
-            // 更新按钮状态
-            document.getElementById('buyNucleusBtn').disabled = gameState.particles < gameState.nucleusPrice;
-            document.getElementById('buyAtomBtn').disabled = gameState.particles < gameState.atomPrice;
-            document.getElementById('buyDnaBtn').disabled = gameState.particles < gameState.dnaPrice;
+            // 对于较小的数字，保留整数部分
+            return Math.floor(num).toString();
         }
 
+        // 计算单个资源的当前价格
+        function getCurrentPrice(basePrice, count) {
+            if (typeof basePrice === 'string') {
+                const price = gameState[basePrice];
+                // 根据已拥有的资源数量增加价格
+                const multiplier = Math.pow(1.15, count || 0);  // 每次购买价格增加15%
+                return Math.floor(price * multiplier);
+            }
+            return basePrice;
+        }
+
+        // 优化的效率计算函数
         function calculateEfficiency(count) {
-            return 1 / (1 + count * 0.1);
+            if (count <= gameState.efficiencyDropStart) {
+                return 1.0;
+            }
+            
+            // 100-10000: 95%
+            if (count <= 10000) {
+                return 0.95;
+            }
+            
+            // 10001-100000: 90%
+            if (count <= 100000) {
+                return 0.90;
+            }
+            
+            // 100001-1000000: 85%
+            if (count <= 1000000) {
+                return 0.85;
+            }
+            
+            // 1000001-10000000: 80%
+            if (count <= 10000000) {
+                return 0.80;
+            }
+            
+            // 10000001-100000000: 75%
+            if (count <= 100000000) {
+                return 0.75;
+            }
+            
+            // 100000001-1000000000: 70%
+            if (count <= 1000000000) {
+                return 0.70;
+            }
+            
+            // 1000000001-10000000000: 60%
+            if (count <= 10000000000) {
+                return 0.60;
+            }
+            
+            // 10000000001-100000000000: 50%
+            if (count <= 100000000000) {
+                return 0.50;
+            }
+            
+            // 100000000001-1000000000000: 40%
+            if (count <= 1000000000000) {
+                return 0.40;
+            }
+            
+            // 最低效率30%
+            return 0.30;
         }
 
-        function createParticleEffect(color = '#00ff9d') {
+        // 计算可以购买的最大数量
+        function getMaxPurchase(basePrice, currentCount, availableParticles) {
+            try {
+                if (isNaN(availableParticles) || !isFinite(availableParticles)) return 0;
+                if (isNaN(basePrice) || !isFinite(basePrice)) return 0;
+                if (basePrice <= 0) return 0;
+                
+                // 限制一次最多购买1000个，防止游戏失衡
+                const maxPurchase = Math.min(
+                    Math.floor(availableParticles / basePrice),
+                    1000
+                );
+                return Math.max(0, maxPurchase);
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        // 自动购买逻辑
+        function autoBuy() {
+            // 从低级到高级检查自动购买
+            const autoBuyChecks = [
+                { resource: 'nuclei', price: gameState.nucleusPrice, currency: 'particles', auto: gameState.autoNucleus },
+                { resource: 'atoms', price: gameState.atomPrice, currency: 'nuclei', auto: gameState.autoAtom },
+                { resource: 'molecules', price: gameState.moleculePrice, currency: 'atoms', auto: gameState.autoMolecule },
+                { resource: 'proteins', price: gameState.proteinPrice, currency: 'molecules', auto: gameState.autoProtein },
+                { resource: 'membrane', price: gameState.membranePrice, currency: 'proteins', auto: gameState.autoMembrane },
+                { resource: 'cells', price: gameState.cellPrice, currency: 'membrane', auto: gameState.autoCell },
+                { resource: 'organisms', price: gameState.organismPrice, currency: 'cells', auto: gameState.autoOrganism },
+                { resource: 'animals', price: gameState.animalPrice, currency: 'organisms', auto: gameState.autoAnimal },
+                { resource: 'humans', price: gameState.humanPrice, currency: 'animals', auto: gameState.autoHuman }
+            ];
+            
+            // 为每个资源检查是否可以购买
+            autoBuyChecks.forEach((check) => {
+                if (check.auto) {
+                    const availableCurrency = gameState[check.currency];
+                    const maxPurchase = Math.floor(availableCurrency / check.price);
+                    
+                    if (maxPurchase > 0) {
+                        const totalCost = check.price * maxPurchase;
+                        gameState[check.currency] -= totalCost;
+                        gameState[check.resource] += maxPurchase;
+                    }
+                }
+            });
+
+            // 栖息地系统的自动购买
+            const habitatAutoBuyChecks = [
+                { resource: 'stone', price: gameState.stonePrice, auto: gameState.autoStone },
+                { resource: 'mountain', price: gameState.mountainPrice, auto: gameState.autoMountain },
+                { resource: 'continent', price: gameState.continentPrice, auto: gameState.autoContinent },
+                { resource: 'planet', price: gameState.planetPrice, auto: gameState.autoPlanet },
+                { resource: 'star', price: gameState.starPrice, auto: gameState.autoStar },
+                { resource: 'galaxy', price: gameState.galaxyPrice, auto: gameState.autoGalaxy },
+                { resource: 'cluster', price: gameState.clusterPrice, auto: gameState.autoCluster },
+                { resource: 'blackhole', price: gameState.blackholePrice, auto: gameState.autoBlackhole }
+            ];
+            
+            habitatAutoBuyChecks.forEach((check) => {
+                if (check.auto) {
+                    const maxPurchase = Math.floor(gameState.particles / check.price);
+                    
+                    if (maxPurchase > 0) {
+                        const totalCost = check.price * maxPurchase;
+                        gameState.particles -= totalCost;
+                        gameState[check.resource] += maxPurchase;
+                    }
+                }
+            });
+        }
+
+        // 初始化事件监听
+        const buyActions = [
+            { 
+                id: 'buyNucleusBtn',          // 原子核购买按钮
+                resource: 'nuclei',            // 购买原子核
+                price: 'nucleusPrice',         // 使用nucleusPrice定价
+                currency: 'particles',         // 使用粒子购买
+                auto: 'autoNucleus',          // 自动购买配置
+                color: '#ff9d00'              // 橙色特效
+            },
+            { 
+                id: 'buyAtomBtn',             // 原子购买按钮
+                resource: 'atoms',             // 购买原子
+                price: 'atomPrice',           // 使用atomPrice定价
+                currency: 'nuclei',           // 使用原子核购买
+                auto: 'autoAtom',             // 自动购买配置
+                color: '#9d00ff'              // 紫色特效
+            },
+            { 
+                id: 'buyMoleculeBtn',         // 分子购买按钮
+                resource: 'molecules',         // 购买分子
+                price: 'moleculePrice',       // 使用moleculePrice定价
+                currency: 'atoms',            // 使用原子购买
+                auto: 'autoMolecule',         // 自动购买配置
+                color: '#ff0099'              // 粉色特效
+            },
+            {
+                id: 'buyProteinBtn',          // 蛋白质购买按钮
+                resource: 'proteins',          // 购买蛋白质
+                price: 'proteinPrice',        // 使用proteinPrice定价
+                currency: 'molecules',         // 使用分子购买
+                auto: 'autoProtein',          // 自动购买配置
+                color: '#99ff00'              // 绿色特效
+            },
+            {
+                id: 'buyMembraneBtn',         // 细胞膜购买按钮
+                resource: 'membrane',          // 购买细胞膜
+                price: 'membranePrice',       // 使用membranePrice定价
+                currency: 'proteins',         // 使用蛋白质购买
+                auto: 'autoMembrane',         // 自动购买配置
+                color: '#00ff99'              // 青绿色特效
+            },
+            { 
+                id: 'buyCellBtn',             // 细胞购买按钮
+                resource: 'cells',             // 购买细胞
+                price: 'cellPrice',           // 使用cellPrice定价
+                currency: 'membrane',         // 使用细胞膜购买
+                auto: 'autoCell',             // 自动购买配置
+                color: '#00ffff'              // 青色特效
+            },
+            { 
+                id: 'buyOrganismBtn',         // 微生物购买按钮
+                resource: 'organisms',         // 购买微生物
+                price: 'organismPrice',       // 使用organismPrice定价
+                currency: 'cells',            // 使用细胞购买
+                auto: 'autoOrganism',         // 自动购买配置
+                color: '#ffff00'              // 黄色特效
+            },
+            {
+                id: 'buyWormBtn',             // 蠕虫购买按钮
+                resource: 'worms',            // 购买蠕虫
+                price: 'wormPrice',           // 使用wormPrice定价
+                currency: 'organisms',        // 使用微生物购买
+                auto: 'autoWorm',             // 自动购买配置
+                color: '#ff9900'              // 橙色特效
+            },
+            {
+                id: 'buyFishBtn',             // 鱼类购买按钮
+                resource: 'fish',             // 购买鱼类
+                price: 'fishPrice',           // 使用fishPrice定价
+                currency: 'worms',            // 使用蠕虫购买
+                auto: 'autoFish',             // 自动购买配置
+                color: '#00ffcc'              // 青色特效
+            },
+            {
+                id: 'buyAnimalBtn',           // 动物购买按钮
+                resource: 'animals',           // 购买动物
+                price: 'animalPrice',         // 使用animalPrice定价
+                currency: 'fish',             // 使用鱼类购买
+                auto: 'autoAnimal',           // 自动购买配置
+                color: '#ff4444'              // 红色特效
+            },
+            {
+                id: 'buyMammalBtn',           // 哺乳动物购买按钮
+                resource: 'mammals',           // 购买哺乳动物
+                price: 'mammalPrice',         // 使用mammalPrice定价
+                currency: 'animals',          // 使用动物购买
+                auto: 'autoMammal',           // 自动购买配置
+                color: '#44ff88'              // 绿色特效
+            },
+            {
+                id: 'buyApeBtn',              // 灵长类购买按钮
+                resource: 'apes',             // 购买灵长类
+                price: 'apePrice',            // 使用apePrice定价
+                currency: 'mammals',          // 使用哺乳动物购买
+                auto: 'autoApe',              // 自动购买配置
+                color: '#8844ff'              // 紫色特效
+            },
+            { 
+                id: 'buyHumanBtn',            // 智慧生命购买按钮
+                resource: 'humans',           // 购买智慧生命
+                price: 'humanPrice',          // 使用humanPrice定价
+                currency: 'apes',             // 使用灵长类购买
+                auto: 'autoHuman',            // 自动购买配置
+                color: '#44ff44'              // 绿色特效
+            }
+        ];
+
+        // 初始化栖息地系统的购买按钮事件
+        const habitatBuyActions = [
+            { id: 'buyStoneBtn', resource: 'stone', price: 'stonePrice', currency: 'humans', auto: 'autoStone', color: '#808080' },
+            { id: 'buyMountainBtn', resource: 'mountain', price: 'mountainPrice', currency: 'stone', auto: 'autoMountain', color: '#a0522d' },
+            { id: 'buyContinentBtn', resource: 'continent', price: 'continentPrice', currency: 'mountain', auto: 'autoContinent', color: '#8b4513' },
+            { id: 'buyPlanetBtn', resource: 'planet', price: 'planetPrice', currency: 'continent', auto: 'autoPlanet', color: '#4169e1' },
+            { id: 'buyStarBtn', resource: 'star', price: 'starPrice', currency: 'planet', auto: 'autoStar', color: '#ffd700' },
+            { id: 'buyGalaxyBtn', resource: 'galaxy', price: 'galaxyPrice', currency: 'star', auto: 'autoGalaxy', color: '#9370db' },
+            { id: 'buyClusterBtn', resource: 'cluster', price: 'clusterPrice', currency: 'galaxy', auto: 'autoCluster', color: '#4b0082' },
+            { id: 'buyBlackholeBtn', resource: 'blackhole', price: 'blackholePrice', currency: 'cluster', auto: 'autoBlackhole', color: '#000000' }
+        ];
+
+        // 为每个购买按钮添加点击事件
+        buyActions.forEach(action => {
+            const button = document.getElementById(action.id);
+            if (!button) {
+                console.error(`Button ${action.id} not found`);
+                return;
+            }
+            
+            // 添加购买点击事件
+            button.addEventListener('click', () => {
+                const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                const currency = gameState[action.currency];
+                
+                // 检查是否有足够的货币购买
+                if (currency >= currentPrice) {
+                    // 扣除货币
+                    gameState[action.currency] -= currentPrice;
+                    // 增加资源
+                    gameState[action.resource] += 1;
+                    // 更新显示
+                    updateDisplay();
+                    // 创建购买特效
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => createParticleEffect(action.color), i * 100);
+                    }
+                }
+            });
+            
+            // 添加自动购买按钮事件
+            const autoButton = document.getElementById('auto' + action.id.slice(3));
+            if (!autoButton) {
+                console.error(`Auto button for ${action.id} not found`);
+                return;
+            }
+            
+            autoButton.addEventListener('click', () => {
+                // 切换自动购买状态
+                gameState[action.auto] = !gameState[action.auto];
+                // 更新按钮样式
+                autoButton.classList.toggle('active');
+            });
+        });
+
+        habitatBuyActions.forEach(action => {
+            const button = document.getElementById(action.id);
+            button.addEventListener('click', () => {
+                const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                
+                if (gameState.particles >= currentPrice) {
+                    gameState.particles -= currentPrice;
+                    gameState[action.resource] += 1;
+                    updateDisplay();
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => createParticleEffect(action.color), i * 100);
+                    }
+                }
+            });
+            
+            // 自动购买按钮事件
+            const autoButton = document.getElementById('auto' + action.id.slice(3));
+            autoButton.addEventListener('click', () => {
+                gameState[action.auto] = !gameState[action.auto];
+                autoButton.classList.toggle('active');
+            });
+        });
+
+        // 初始化事件监听
+        document.getElementById('timeSkipBtn').addEventListener('click', () => {
+            skipTime(100);
+        });
+
+        // 添加进化相关函数
+        function calculateEvolutionProbability(territory) {
+            return territory * 0.0000000001; // 每1领土增加0.0000000001%的进化概率
+        }
+
+        function tryEvolution(resourceType) {
+            const probability = calculateEvolutionProbability(gameState.territory);
+            if (Math.random() < probability && gameState[resourceType] > 0) {
+                gameState.evolutionCounts[resourceType]++;
+                // 更新显示
+                const evolutionCountElement = document.getElementById(`${resourceType}EvolutionCount`);
+                if (evolutionCountElement) {
+                    evolutionCountElement.textContent = `进化: ${gameState.evolutionCounts[resourceType]}`;
+                }
+            }
+        }
+
+        // 修改生产循环，添加进化检查
+        setInterval(() => {
+            try {
+                // 检查每种生物的进化
+                Object.keys(gameState.evolutionCounts).forEach(resourceType => {
+                    tryEvolution(resourceType);
+                });
+
+                // 从高到低计算生产（修改生产计算，考虑进化加成）
+                if (gameState.humans > 0) {
+                    const efficiency = calculateEfficiency(gameState.humans);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.humans);
+                    gameState.apes += Math.floor(gameState.humans * gameState.humanProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.apes > 0) {
+                    const efficiency = calculateEfficiency(gameState.apes);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.apes);
+                    gameState.mammals += Math.floor(gameState.apes * gameState.apeProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.mammals > 0) {
+                    const efficiency = calculateEfficiency(gameState.mammals);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.mammals);
+                    gameState.animals += Math.floor(gameState.mammals * gameState.mammalProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.animals > 0) {
+                    const efficiency = calculateEfficiency(gameState.animals);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.animals);
+                    gameState.fish += Math.floor(gameState.animals * gameState.animalProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.fish > 0) {
+                    const efficiency = calculateEfficiency(gameState.fish);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.fish);
+                    gameState.worms += Math.floor(gameState.fish * gameState.fishProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.worms > 0) {
+                    const efficiency = calculateEfficiency(gameState.worms);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.worms);
+                    gameState.organisms += Math.floor(gameState.worms * gameState.wormProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.organisms > 0) {
+                    const efficiency = calculateEfficiency(gameState.organisms);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.organisms);
+                    gameState.cells += Math.floor(gameState.organisms * gameState.organismProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.cells > 0) {
+                    const efficiency = calculateEfficiency(gameState.cells);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.cells);
+                    gameState.membrane += Math.floor(gameState.cells * gameState.cellProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.membrane > 0) {
+                    const efficiency = calculateEfficiency(gameState.membrane);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.membrane);
+                    gameState.proteins += Math.floor(gameState.membrane * gameState.membraneProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.proteins > 0) {
+                    const efficiency = calculateEfficiency(gameState.proteins);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.proteins);
+                    gameState.molecules += Math.floor(gameState.proteins * gameState.proteinProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.molecules > 0) {
+                    const efficiency = calculateEfficiency(gameState.molecules);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.molecules);
+                    gameState.atoms += Math.floor(gameState.molecules * gameState.moleculeProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.atoms > 0) {
+                    const efficiency = calculateEfficiency(gameState.atoms);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.atoms);
+                    gameState.nuclei += Math.floor(gameState.atoms * gameState.atomProductionRate * efficiency * evolutionMultiplier);
+                }
+                if (gameState.nuclei > 0) {
+                    const efficiency = calculateEfficiency(gameState.nuclei);
+                    const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.nuclei);
+                    gameState.particles += Math.floor(gameState.nuclei * gameState.nucleusProductionRate * efficiency * evolutionMultiplier);
+                }
+
+                // 添加栖息地系统的生产
+                updateHabitatProduction();
+                
+                // 执行自动购买
+                autoBuy();
+                
+                // 更新显示
+                updateDisplay();
+            } catch (e) {
+                console.error('Production error:', e);
+            }
+        }, 1000);
+
+        // 时间加速函数
+        function skipTime(seconds) {
+            try {
+                for (let i = 0; i < seconds; i++) {
+                    if (gameState.humans > 0) {
+                        const efficiency = calculateEfficiency(gameState.humans);
+                        gameState.apes += Math.floor(gameState.humans * gameState.humanProductionRate * efficiency);
+                    }
+                    if (gameState.apes > 0) {
+                        const efficiency = calculateEfficiency(gameState.apes);
+                        gameState.mammals += Math.floor(gameState.apes * gameState.apeProductionRate * efficiency);
+                    }
+                    if (gameState.mammals > 0) {
+                        const efficiency = calculateEfficiency(gameState.mammals);
+                        gameState.animals += Math.floor(gameState.mammals * gameState.mammalProductionRate * efficiency);
+                    }
+                    if (gameState.animals > 0) {
+                        const efficiency = calculateEfficiency(gameState.animals);
+                        gameState.fish += Math.floor(gameState.animals * gameState.animalProductionRate * efficiency);
+                    }
+                    if (gameState.fish > 0) {
+                        const efficiency = calculateEfficiency(gameState.fish);
+                        gameState.worms += Math.floor(gameState.fish * gameState.fishProductionRate * efficiency);
+                    }
+                    if (gameState.worms > 0) {
+                        const efficiency = calculateEfficiency(gameState.worms);
+                        gameState.organisms += Math.floor(gameState.worms * gameState.wormProductionRate * efficiency);
+                    }
+                    if (gameState.organisms > 0) {
+                        const efficiency = calculateEfficiency(gameState.organisms);
+                        gameState.cells += Math.floor(gameState.organisms * gameState.organismProductionRate * efficiency);
+                    }
+                    if (gameState.cells > 0) {
+                        const efficiency = calculateEfficiency(gameState.cells);
+                        gameState.membrane += Math.floor(gameState.cells * gameState.cellProductionRate * efficiency);
+                    }
+                    if (gameState.membrane > 0) {
+                        const efficiency = calculateEfficiency(gameState.membrane);
+                        gameState.proteins += Math.floor(gameState.membrane * gameState.membraneProductionRate * efficiency);
+                    }
+                    if (gameState.proteins > 0) {
+                        const efficiency = calculateEfficiency(gameState.proteins);
+                        gameState.molecules += Math.floor(gameState.proteins * gameState.proteinProductionRate * efficiency);
+                    }
+                    if (gameState.molecules > 0) {
+                        const efficiency = calculateEfficiency(gameState.molecules);
+                        gameState.atoms += Math.floor(gameState.molecules * gameState.moleculeProductionRate * efficiency);
+                    }
+                    if (gameState.atoms > 0) {
+                        const efficiency = calculateEfficiency(gameState.atoms);
+                        gameState.nuclei += Math.floor(gameState.atoms * gameState.atomProductionRate * efficiency);
+                    }
+                    if (gameState.nuclei > 0) {
+                        const efficiency = calculateEfficiency(gameState.nuclei);
+                        gameState.particles += Math.floor(gameState.nuclei * gameState.nucleusProductionRate * efficiency);
+                    }
+                }
+                
+                // 添加栖息地系统的生产
+                updateHabitatProduction();
+                
+                // 执行自动购买
+                autoBuy();
+                
+                // 更新显示
+                updateDisplay();
+            } catch (e) {
+                console.error('Skip time error:', e);
+            }
+        }
+
+        // 更新显示函数
+        function updateDisplay() {
+            try {
+                // 更新资源数量显示
+                document.getElementById('humanCount').textContent = formatNumber(gameState.humans);
+                document.getElementById('animalCount').textContent = formatNumber(gameState.animals);
+                document.getElementById('organismCount').textContent = formatNumber(gameState.organisms);
+                document.getElementById('cellCount').textContent = formatNumber(gameState.cells);
+                document.getElementById('moleculeCount').textContent = formatNumber(gameState.molecules);
+                document.getElementById('atomCount').textContent = formatNumber(gameState.atoms);
+                document.getElementById('nucleusCount').textContent = formatNumber(gameState.nuclei);
+                document.getElementById('particleCount').textContent = formatNumber(gameState.particles);
+
+                // 更新生物系统按钮状态
+                buyActions.forEach(action => {
+                    const button = document.getElementById(action.id);
+                    const autoButton = document.getElementById('auto' + action.id.slice(3));
+                    if (button && autoButton) {
+                        const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                        button.textContent = `购买 (${formatNumber(currentPrice)}${getCurrencyName(action.currency)})`;
+                        
+                        // 检查是否有足够的货币购买
+                        const canAfford = gameState[action.currency] >= currentPrice;
+                        // 检查是否达到购买条件
+                        const canBuy = canAfford && !isNaN(currentPrice) && isFinite(currentPrice) && currentPrice > 0;
+                        button.disabled = !canBuy;
+                        
+                        // 更新按钮样式
+                        if (canBuy) {
+                            button.style.background = '#4CAF50';
+                            button.style.cursor = 'pointer';
+                            button.style.opacity = '1';
+                        } else {
+                            button.style.background = '#666666';
+                            button.style.cursor = 'not-allowed';
+                            button.style.opacity = '0.6';
+                        }
+                        
+                        // 更新自动购买按钮状态
+                        autoButton.classList.toggle('active', gameState[action.auto]);
+                    }
+                });
+
+                // 更新栖息地系统按钮状态
+                habitatBuyActions.forEach(action => {
+                    const button = document.getElementById(action.id);
+                    const autoButton = document.getElementById('auto' + action.id.slice(3));
+                    if (button && autoButton) {
+                        const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                        button.textContent = `购买 (${formatNumber(currentPrice)}粒子)`;
+                        
+                        // 检查是否有足够的粒子购买
+                        const canAfford = gameState.particles >= currentPrice;
+                        // 检查是否达到购买条件
+                        const canBuy = canAfford && !isNaN(currentPrice) && isFinite(currentPrice) && currentPrice > 0;
+                        button.disabled = !canBuy;
+                        
+                        // 更新按钮样式
+                        if (canBuy) {
+                            button.style.background = '#4CAF50';
+                            button.style.cursor = 'pointer';
+                            button.style.opacity = '1';
+                        } else {
+                            button.style.background = '#666666';
+                            button.style.cursor = 'not-allowed';
+                            button.style.opacity = '0.6';
+                        }
+                        
+                        // 更新自动购买按钮状态
+                        autoButton.classList.toggle('active', gameState[action.auto]);
+                    }
+                });
+
+                // 更新生产率显示
+                updateProductionRates();
+                
+                // 更新栖息地系统显示
+                updateHabitatDisplay();
+            } catch (e) {
+                console.error('Display update error:', e);
+            }
+        }
+
+        // 获取货币名称
+        function getCurrencyName(currency) {
+            const currencyNames = {
+                'particles': '粒子',
+                'nuclei': '原子核',
+                'atoms': '原子',
+                'molecules': '分子',
+                'proteins': '蛋白质',
+                'membrane': '细胞膜',
+                'cells': '细胞',
+                'organisms': '微生物',
+                'worms': '蠕虫',
+                'fish': '鱼类',
+                'animals': '动物',
+                'mammals': '哺乳动物',
+                'apes': '灵长类',
+                'humans': '智慧生命',
+                'stone': '石头',
+                'mountain': '山脉',
+                'continent': '大陆',
+                'planet': '行星',
+                'star': '恒星',
+                'galaxy': '星系',
+                'cluster': '星团',
+                'blackhole': '黑洞'
+            };
+            return currencyNames[currency] || '';
+        }
+
+        // 更新生产率显示
+        function updateProductionRates() {
+            // 更新粒子的生产率
+            const particleRate = document.getElementById('particleRate');
+            if (particleRate && gameState.nuclei > 0) {
+                const efficiency = calculateEfficiency(gameState.nuclei);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.nuclei);
+                const production = gameState.nuclei * gameState.nucleusProductionRate * efficiency * evolutionMultiplier;
+                particleRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}% x${evolutionMultiplier}倍)`;
+            }
+
+            // 更新原子核的生产率
+            const nucleusRate = document.getElementById('nucleusRate');
+            if (nucleusRate && gameState.atoms > 0) {
+                const efficiency = calculateEfficiency(gameState.atoms);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.atoms);
+                const production = gameState.atoms * gameState.atomProductionRate * efficiency * evolutionMultiplier;
+                nucleusRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}% x${evolutionMultiplier}倍)`;
+            }
+
+            // 更新原子的生产率
+            const atomRate = document.getElementById('atomRate');
+            if (atomRate && gameState.molecules > 0) {
+                const efficiency = calculateEfficiency(gameState.molecules);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.molecules);
+                const production = gameState.molecules * gameState.moleculeProductionRate * efficiency * evolutionMultiplier;
+                atomRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}% x${evolutionMultiplier}倍)`;
+            }
+
+            // 更新分子的生产率
+            const moleculeRate = document.getElementById('moleculeRate');
+            if (moleculeRate && gameState.proteins > 0) {
+                const efficiency = calculateEfficiency(gameState.proteins);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.proteins);
+                const production = gameState.proteins * gameState.proteinProductionRate * efficiency * evolutionMultiplier;
+                moleculeRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}% x${evolutionMultiplier}倍)`;
+            }
+
+            // 更新蛋白质的生产率
+            const proteinRate = document.getElementById('proteinRate');
+            if (proteinRate && gameState.membrane > 0) {
+                const efficiency = calculateEfficiency(gameState.membrane);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.membrane);
+                const production = gameState.membrane * gameState.membraneProductionRate * efficiency * evolutionMultiplier;
+                proteinRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}% x${evolutionMultiplier}倍)`;
+            }
+
+            // 更新细胞膜的生产率
+            const membraneRate = document.getElementById('membraneRate');
+            if (membraneRate && gameState.cells > 0) {
+                const efficiency = calculateEfficiency(gameState.cells);
+                const evolutionMultiplier = Math.pow(10, gameState.evolutionCounts.cells);
+                const production = gameState.cells * gameState.cellProductionRate * efficiency;
+                membraneRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新细胞的生产率
+            const cellRate = document.getElementById('cellRate');
+            if (cellRate && gameState.organisms > 0) {
+                const efficiency = calculateEfficiency(gameState.organisms);
+                const production = gameState.organisms * gameState.organismProductionRate * efficiency;
+                cellRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新微生物的生产率
+            const organismRate = document.getElementById('organismRate');
+            if (organismRate && gameState.worms > 0) {
+                const efficiency = calculateEfficiency(gameState.worms);
+                const production = gameState.worms * gameState.wormProductionRate * efficiency;
+                organismRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新蠕虫的生产率
+            const wormRate = document.getElementById('wormRate');
+            if (wormRate && gameState.fish > 0) {
+                const efficiency = calculateEfficiency(gameState.fish);
+                const production = gameState.fish * gameState.fishProductionRate * efficiency;
+                wormRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新鱼类的生产率
+            const fishRate = document.getElementById('fishRate');
+            if (fishRate && gameState.animals > 0) {
+                const efficiency = calculateEfficiency(gameState.animals);
+                const production = gameState.animals * gameState.animalProductionRate * efficiency;
+                fishRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新动物的生产率
+            const animalRate = document.getElementById('animalRate');
+            if (animalRate && gameState.mammals > 0) {
+                const efficiency = calculateEfficiency(gameState.mammals);
+                const production = gameState.mammals * gameState.mammalProductionRate * efficiency;
+                animalRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新哺乳动物的生产率
+            const mammalRate = document.getElementById('mammalRate');
+            if (mammalRate && gameState.apes > 0) {
+                const efficiency = calculateEfficiency(gameState.apes);
+                const production = gameState.apes * gameState.apeProductionRate * efficiency;
+                mammalRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新灵长类的生产率
+            const apeRate = document.getElementById('apeRate');
+            if (apeRate && gameState.humans > 0) {
+                const efficiency = calculateEfficiency(gameState.humans);
+                const production = gameState.humans * gameState.humanProductionRate * efficiency;
+                apeRate.textContent = `+${formatNumber(production)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+
+            // 更新智慧生命的生产率
+            const humanRate = document.getElementById('humanRate');
+            if (humanRate) {
+                humanRate.textContent = '+0/秒';
+            }
+        }
+
+        // 更新栖息地系统显示
+        function updateHabitatDisplay() {
+            document.getElementById('stoneCount').textContent = formatNumber(gameState.stone);
+            document.getElementById('mountainCount').textContent = formatNumber(gameState.mountain);
+            document.getElementById('continentCount').textContent = formatNumber(gameState.continent);
+            document.getElementById('planetCount').textContent = formatNumber(gameState.planet);
+            document.getElementById('starCount').textContent = formatNumber(gameState.star);
+            document.getElementById('galaxyCount').textContent = formatNumber(gameState.galaxy);
+            document.getElementById('clusterCount').textContent = formatNumber(gameState.cluster);
+            document.getElementById('blackholeCount').textContent = formatNumber(gameState.blackhole);
+            document.getElementById('territoryCount').textContent = formatNumber(gameState.territory);
+
+            // 更新栖息地生产率显示
+            updateHabitatRates();
+            
+            // 更新栖息地按钮状态
+            updateHabitatButtons();
+        }
+
+        // 添加栖息地生产率显示更新函数
+        function updateHabitatRates() {
+            if (gameState.stone > 0) {
+                const efficiency = calculateEfficiency(gameState.stone);
+                document.getElementById('stoneRate').textContent = 
+                    `+${formatNumber(gameState.stone * efficiency)}/秒 (${Math.floor(efficiency * 100)}%)`;
+            }
+            // ... 类似地添加其他栖息地的生产率显示 ...
+        }
+
+        // 添加栖息地按钮状态更新函数
+        function updateHabitatButtons() {
+            document.getElementById('buyStoneBtn').disabled = gameState.particles < gameState.stonePrice;
+            document.getElementById('buyMountainBtn').disabled = gameState.particles < gameState.mountainPrice;
+            document.getElementById('buyContinentBtn').disabled = gameState.particles < gameState.continentPrice;
+            document.getElementById('buyPlanetBtn').disabled = gameState.particles < gameState.planetPrice;
+            document.getElementById('buyStarBtn').disabled = gameState.particles < gameState.starPrice;
+            document.getElementById('buyGalaxyBtn').disabled = gameState.particles < gameState.galaxyPrice;
+            document.getElementById('buyClusterBtn').disabled = gameState.particles < gameState.clusterPrice;
+            document.getElementById('buyBlackholeBtn').disabled = gameState.particles < gameState.blackholePrice;
+        }
+
+        // 修改视图切换逻辑
+        document.querySelectorAll('.system-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有按钮的active类
+                document.querySelectorAll('.system-btn').forEach(b => b.classList.remove('active'));
+                // 给当前按钮添加active类
+                btn.classList.add('active');
+                
+                // 获取要切换的系统
+                const system = btn.dataset.system;
+                
+                // 隐藏所有系统界面
+                document.querySelector('.resources').style.display = 'none';
+                document.querySelector('.habitat-system').style.display = 'none';
+                
+                // 显示对应的系统界面
+                switch(system) {
+                    case 'biology':
+                        document.querySelector('.resources').style.display = 'flex';
+                        break;
+                    case 'habitat':
+                        document.querySelector('.habitat-system').style.display = 'flex';
+                        break;
+                    case 'system3':
+                    case 'system4':
+                    case 'system5':
+                        // 待定系统的显示逻辑
+                        break;
+                }
+            });
+        });
+
+        // 初始化视图
+        document.querySelector('.habitat-system').style.display = 'none';
+        document.querySelector('.resources').style.display = 'flex';
+
+        // 初始化按钮状态
+        function initializeButtonStates() {
+            // 初始化生物系统按钮状态
+            buyActions.forEach(action => {
+                const button = document.getElementById(action.id);
+                const autoButton = document.getElementById('auto' + action.id.slice(3));
+                if (button && autoButton) {
+                    const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                    button.textContent = `购买 (${formatNumber(currentPrice)}${getCurrencyName(action.currency)})`;
+                    button.disabled = gameState[action.currency] < currentPrice;
+                    
+                    // 设置自动购买按钮状态
+                    autoButton.classList.toggle('active', gameState[action.auto]);
+                }
+            });
+
+            // 初始化栖息地系统按钮状态
+            habitatBuyActions.forEach(action => {
+                const button = document.getElementById(action.id);
+                const autoButton = document.getElementById('auto' + action.id.slice(3));
+                if (button && autoButton) {
+                    const currentPrice = getCurrentPrice(gameState[action.price], gameState[action.resource]);
+                    button.textContent = `购买 (${formatNumber(currentPrice)}粒子)`;
+                    button.disabled = gameState.particles < currentPrice;
+                    
+                    // 设置自动购买按钮状态
+                    autoButton.classList.toggle('active', gameState[action.auto]);
+                }
+            });
+        }
+
+        // 页面加载完成后初始化按钮状态
+        document.addEventListener('DOMContentLoaded', initializeButtonStates);
+
+        function createParticleEffect(color) {
             const particle = document.createElement('div');
             particle.className = 'particle-effect';
             particle.style.background = color;
@@ -314,72 +1845,41 @@
             setTimeout(() => particle.remove(), 3000);
         }
 
-        function gameLoop() {
-            const now = Date.now();
-            const deltaTime = (now - gameState.lastTick) / 1000;
-            gameState.lastTick = now;
-
-            // 计算各级生物的效率
-            const nucleusEfficiency = calculateEfficiency(gameState.nuclei);
-            const atomEfficiency = calculateEfficiency(gameState.atoms);
-            const dnaEfficiency = calculateEfficiency(gameState.dna);
-            
-            // 计算新产生的资源
-            const newParticles = gameState.nuclei * gameState.nucleusProductionRate * nucleusEfficiency * deltaTime;
-            const newNuclei = gameState.atoms * gameState.atomProductionRate * atomEfficiency * deltaTime;
-            const newAtoms = gameState.dna * gameState.dnaProductionRate * dnaEfficiency * deltaTime;
-            
-            // 更新资源数量
-            gameState.particles += newParticles;
-            gameState.nuclei += newNuclei;
-            gameState.atoms += newAtoms;
-            gameState.totalParticles += newParticles;
-
-            // 创建视觉效果
-            if (Math.random() < newParticles * 0.1) createParticleEffect(var(--particle-color));
-            if (Math.random() < newNuclei * 0.1) createParticleEffect(var(--nucleus-color));
-            if (Math.random() < newAtoms * 0.1) createParticleEffect(var(--atom-color));
-
-            updateDisplay();
-            requestAnimationFrame(gameLoop);
+        // 添加栖息地系统的生产逻辑
+        function updateHabitatProduction() {
+            if (gameState.blackhole > 0) {
+                const efficiency = calculateEfficiency(gameState.blackhole);
+                gameState.territory += Math.floor(gameState.blackhole * gameState.blackholeProductionRate * efficiency * 128);
+            }
+            if (gameState.cluster > 0) {
+                const efficiency = calculateEfficiency(gameState.cluster);
+                gameState.territory += Math.floor(gameState.cluster * gameState.clusterProductionRate * efficiency * 64);
+            }
+            if (gameState.galaxy > 0) {
+                const efficiency = calculateEfficiency(gameState.galaxy);
+                gameState.territory += Math.floor(gameState.galaxy * gameState.galaxyProductionRate * efficiency * 32);
+            }
+            if (gameState.star > 0) {
+                const efficiency = calculateEfficiency(gameState.star);
+                gameState.territory += Math.floor(gameState.star * gameState.starProductionRate * efficiency * 16);
+            }
+            if (gameState.planet > 0) {
+                const efficiency = calculateEfficiency(gameState.planet);
+                gameState.territory += Math.floor(gameState.planet * gameState.planetProductionRate * efficiency * 8);
+            }
+            if (gameState.continent > 0) {
+                const efficiency = calculateEfficiency(gameState.continent);
+                gameState.territory += Math.floor(gameState.continent * gameState.continentProductionRate * efficiency * 4);
+            }
+            if (gameState.mountain > 0) {
+                const efficiency = calculateEfficiency(gameState.mountain);
+                gameState.territory += Math.floor(gameState.mountain * gameState.mountainProductionRate * efficiency * 2);
+            }
+            if (gameState.stone > 0) {
+                const efficiency = calculateEfficiency(gameState.stone);
+                gameState.territory += Math.floor(gameState.stone * gameState.stoneProductionRate * efficiency);
+            }
         }
-
-        // 初始化事件监听
-        document.getElementById('buyNucleusBtn').addEventListener('click', () => {
-            if (gameState.particles >= gameState.nucleusPrice) {
-                gameState.particles -= gameState.nucleusPrice;
-                gameState.nuclei += 1;
-                updateDisplay();
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => createParticleEffect(var(--nucleus-color)), i * 100);
-                }
-            }
-        });
-
-        document.getElementById('buyAtomBtn').addEventListener('click', () => {
-            if (gameState.particles >= gameState.atomPrice) {
-                gameState.particles -= gameState.atomPrice;
-                gameState.atoms += 1;
-                updateDisplay();
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => createParticleEffect(var(--atom-color)), i * 100);
-                }
-            }
-        });
-
-        document.getElementById('buyDnaBtn').addEventListener('click', () => {
-            if (gameState.particles >= gameState.dnaPrice) {
-                gameState.particles -= gameState.dnaPrice;
-                gameState.dna += 1;
-                updateDisplay();
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => createParticleEffect(var(--dna-color)), i * 100);
-                }
-            }
-        });
-
-        // 启动游戏循环
-        gameLoop();
     </script>
 </body>
 </html> 

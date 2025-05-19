@@ -295,21 +295,21 @@
                     }
                 }
                 
-                clearHighlights();
-                if (selectedPiece) {
-                    console.log(`Attempting to move piece from (${selectedPiece.row}, ${selectedPiece.col}) to (${row}, ${col})`);
-                    movePiece(row, col);
-                } else if (board[row][col] && board[row][col].classList.contains(currentPlayer)) {
-                    if (mustCapture() && !canCapture(row, col)) {
-                        console.log(`Must capture, cannot select piece at (${row}, ${col})`);
-                        return;
-                    }
-                    selectedPiece = { piece: board[row][col], row, col };
-                    highlightMoves(row, col);
-                    console.log(`Selected piece at (${row}, ${col})`);
-                } else {
-                    console.log(`Invalid selection at (${row}, ${col})`);
+            clearHighlights();
+            if (selectedPiece) {
+                console.log(`Attempting to move piece from (${selectedPiece.row}, ${selectedPiece.col}) to (${row}, ${col})`);
+                movePiece(row, col);
+            } else if (board[row][col] && board[row][col].classList.contains(currentPlayer)) {
+                if (mustCapture() && !canCapture(row, col)) {
+                    console.log(`Must capture, cannot select piece at (${row}, ${col})`);
+                    return;
                 }
+                selectedPiece = { piece: board[row][col], row, col };
+                highlightMoves(row, col);
+                console.log(`Selected piece at (${row}, ${col})`);
+            } else {
+                console.log(`Invalid selection at (${row}, ${col})`);
+            }
             }
         }
 
@@ -437,7 +437,7 @@
                 if (isCapture) {
                     // 单次吃子，检查是否有后续吃子机会
                     if (canCapture(row, col)) {
-                        highlightMoves(row, col);
+                    highlightMoves(row, col);
                     } else {
                         selectedPiece = null;
                         currentPlayer = currentPlayer === 'white-piece' ? 'black-piece' : 'white-piece';
@@ -721,16 +721,16 @@
             } else {
                 // 普通棋子的移动逻辑保持不变
                 const direction = currentPlayer === 'white-piece' ? -1 : 1;
-                
+
                 if (mustCapture()) {
                     // 在有吃子机会时，必须执行吃子移动
                     if (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2) {
-                        const middleRow = (oldRow + newRow) / 2;
-                        const middleCol = (oldCol + newCol) / 2;
+                    const middleRow = (oldRow + newRow) / 2;
+                    const middleCol = (oldCol + newCol) / 2;
                         if (board[middleRow][middleCol] && 
                             !board[middleRow][middleCol].classList.contains(currentPlayer)) {
-                            board[middleRow][middleCol].remove();
-                            board[middleRow][middleCol] = null;
+                        board[middleRow][middleCol].remove();
+                        board[middleRow][middleCol] = null;
                             return true;
                         }
                     }
@@ -754,18 +754,18 @@
             const capturePositions = [];
             
             if (piece.classList.contains('king')) {
-                for (const [dRow, dCol] of directions) {
-                    let newRow = row + dRow;
-                    let newCol = col + dCol;
-                    let foundOpponent = false;
+            for (const [dRow, dCol] of directions) {
+                let newRow = row + dRow;
+                let newCol = col + dCol;
+                let foundOpponent = false;
                     let opponentRow = -1;
                     let opponentCol = -1;
                     
                     while (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
-                        if (board[newRow][newCol] !== null) {
-                            if (board[newRow][newCol].classList.contains(currentPlayer)) break;
-                            if (foundOpponent) break;
-                            foundOpponent = true;
+                    if (board[newRow][newCol] !== null) {
+                        if (board[newRow][newCol].classList.contains(currentPlayer)) break;
+                        if (foundOpponent) break;
+                        foundOpponent = true;
                             opponentRow = newRow;
                             opponentCol = newCol;
                             
@@ -807,11 +807,11 @@
                                 checkCol += dCol;
                             }
                             break;
-                        }
-                        newRow += dRow;
-                        newCol += dCol;
                     }
+                    newRow += dRow;
+                    newCol += dCol;
                 }
+            }
             } else {
                 for (const [dRow, dCol] of directions) {
                     const newRow = row + 2 * dRow;
@@ -918,19 +918,19 @@
                 }
             } else {
                 // 普通棋子的移动
-                for (const [dRow, dCol] of directions) {
-                    const middleRow = row + dRow;
-                    const middleCol = col + dCol;
-                    const newRow = row + 2 * dRow;
-                    const newCol = col + 2 * dCol;
+            for (const [dRow, dCol] of directions) {
+                const middleRow = row + dRow;
+                const middleCol = col + dCol;
+                const newRow = row + 2 * dRow;
+                const newCol = col + 2 * dCol;
 
                     if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10) {
                         if (board[middleRow][middleCol] && 
                             !board[middleRow][middleCol].classList.contains(currentPlayer) && 
                             board[newRow][newCol] === null) {
-                            const square = document.querySelector(`[data-row='${newRow}'][data-col='${newCol}']`);
-                            square.classList.add('highlight');
-                            canCaptureMove = true;
+                        const square = document.querySelector(`[data-row='${newRow}'][data-col='${newCol}']`);
+                        square.classList.add('highlight');
+                        canCaptureMove = true;
                         }
                     }
                 }
